@@ -10,7 +10,10 @@ import 'Authentication/SignUp.dart';
 import 'Screens/dailyTabBar.dart';
 import 'Screens/message.dart';
 import 'Screens/wish_list.dart';
+import 'admin_screen/admin.dart';
+
 void main() => runApp(HaatBazaar());
+
 class HaatBazaar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -19,21 +22,23 @@ class HaatBazaar extends StatelessWidget {
       theme: ThemeData(
         backgroundColor: Colors.redAccent,
         primaryColor: Colors.redAccent,
-          scaffoldBackgroundColor: Colors.white,
+        scaffoldBackgroundColor: Colors.white,
       ),
-      initialRoute: SplashScreen.id,
+      initialRoute: Admin.id,
+      //initialRoute: SplashScreen.id,
       routes: {
-        SplashScreen.id:(context)=>SplashScreen(),
-        Dashboard.id:(context)=>Dashboard(),
-        Account.id:(context)=>Account(),
-        HomePage.id:(context)=>HomePage(),
-        SignIn.id:(context)=>SignIn(),
-        SignUp.id:(context)=>SignUp(),
-        ConfirmOrder.id:(context)=>ConfirmOrder(),
-        CartList.id:(context)=>CartList(),
-        WishList.id:(context)=>WishList(),
-        DailyTabBar.id:(context)=>DailyTabBar(),
-        Message.id:(context)=>Message(),
+        Admin.id: (context) => Admin(),
+        SplashScreen.id: (context) => SplashScreen(),
+        Dashboard.id: (context) => Dashboard(),
+        Account.id: (context) => Account(),
+        HomePage.id: (context) => HomePage(),
+        SignIn.id: (context) => SignIn(),
+        SignUp.id: (context) => SignUp(),
+        ConfirmOrder.id: (context) => ConfirmOrder(),
+        CartList.id: (context) => CartList(),
+        WishList.id: (context) => WishList(),
+        DailyTabBar.id: (context) => DailyTabBar(),
+        Message.id: (context) => Message(),
       },
     );
   }

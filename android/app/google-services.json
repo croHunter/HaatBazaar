@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "5693017422",
+    "firebase_url": "https://haatbazaar-e7dbb.firebaseio.com",
+    "project_id": "haatbazaar-e7dbb",
+    "storage_bucket": "haatbazaar-e7dbb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:5693017422:android:3d6502d2f891bef4c4221f",
+        "android_client_info": {
+          "package_name": "com.sujan.haatbazaar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "5693017422-qd3f1vlcp1usjld7vj516cd53mvi72n8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOPKlvw6ITm_w97H0NOAOxRaoHm37LcI8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "5693017422-qd3f1vlcp1usjld7vj516cd53mvi72n8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

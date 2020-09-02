@@ -5,6 +5,8 @@ import 'package:haatbazaar/Screens/account.dart';
 import 'package:haatbazaar/Screens/wish_list.dart';
 
 class MainDrawer extends StatelessWidget {
+  MainDrawer({this.loggedInUser});
+  final String loggedInUser;
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -33,13 +35,21 @@ class MainDrawer extends StatelessWidget {
                       ),
                       radius: 50.0,
                     ),
-                    Text(
-                      'Sujan Shrestha',
-                      style: TextStyle(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
-                    ),
+                    loggedInUser != null
+                        ? Text(
+                            loggedInUser,
+                            style: TextStyle(
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          )
+                        : Text(
+                            'Unknown',
+                            style: TextStyle(
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
                     Text(
                       '(Customer)'.toUpperCase(),
                       style: TextStyle(
@@ -48,14 +58,25 @@ class MainDrawer extends StatelessWidget {
                           letterSpacing: 2.5,
                           color: Colors.black45),
                     ),
-                    FlatButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, SignIn.id);
-                        },
-                        child: Text(
-                          'Sign in',
-                          style: TextStyle(color: Colors.white, fontSize: 16.0),
-                        ))
+                    loggedInUser != null
+                        ? FlatButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, SignIn.id);
+                            },
+                            child: Text(
+                              'Logout',
+                              style: TextStyle(
+                                  color: Colors.white, fontSize: 16.0),
+                            ))
+                        : FlatButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, SignIn.id);
+                            },
+                            child: Text(
+                              'Login',
+                              style: TextStyle(
+                                  color: Colors.white, fontSize: 16.0),
+                            ))
                   ],
                 ),
               ),

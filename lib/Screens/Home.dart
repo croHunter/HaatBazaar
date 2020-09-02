@@ -138,7 +138,6 @@ class _HomePageState extends State<HomePage>
 //              child: Container(),
 //              preferredSize: Size(0.0, 0.0),
 //            ),
-          drawer: MainDrawer(),
           body: NestedScrollView(
 //        controller: _scrollController,
             headerSliverBuilder: (context, value) {

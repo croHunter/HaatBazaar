@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:haatbazaar/Screens/Home.dart';
 import 'package:haatbazaar/Screens/account.dart';
@@ -12,7 +13,11 @@ import 'Screens/message.dart';
 import 'Screens/wish_list.dart';
 import 'admin_screen/admin.dart';
 
-void main() => runApp(HaatBazaar());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(HaatBazaar());
+}
 
 class HaatBazaar extends StatelessWidget {
   @override
@@ -24,8 +29,10 @@ class HaatBazaar extends StatelessWidget {
         primaryColor: Colors.redAccent,
         scaffoldBackgroundColor: Colors.white,
       ),
-      initialRoute: Admin.id,
+//      initialRoute: Admin.id,
       //initialRoute: SplashScreen.id,
+      initialRoute: Dashboard.id,
+
       routes: {
         Admin.id: (context) => Admin(),
         SplashScreen.id: (context) => SplashScreen(),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:haatbazaar/RefactorComponent/clippath.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'SignUp.dart';
 
 class SignIn extends StatefulWidget {
@@ -9,263 +10,176 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInState extends State<SignIn> {
+  final _auth = FirebaseAuth.instance;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _autoValidate = false;
+  bool _validated = false;
+  String phoneNo, password;
+  _validateInputs() {
+    if (_formKey.currentState.validate()) {
+//    If all data are correct then save data to out variables
+      _formKey.currentState.save();
+      _validated = true;
+    } else {
+//    If all data are not valid then start auto validation.
+      setState(() {
+        _autoValidate = true;
+      });
+    }
+  }
+
+  Future<void> signIn() async {}
   @override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.redAccent,
-    child: SafeArea(
-      child: Scaffold(
+      child: SafeArea(
+        child: Scaffold(
           backgroundColor: Colors.white,
-          body: ListView(
-            children: <Widget>[
-              Stack(children: <Widget>[
-                ClipPath(
-                  clipper: WaveClipper1(),
-                  child: Container(
-                    child: Column(),
-                    width: double.infinity,
-                    height: 250,
-                    decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                            colors: [Color(0x22ff3a5a), Color(0x22fe494d)])),
-                  ),
-                ),
-                ClipPath(
-                  clipper: WaveClipper2(),
-                  child: Container(
-                    child: Column(),
-                    width: double.infinity,
-                    height: 250,
-                    decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                            colors: [Color(0x22ff3a5a), Color(0x22fe494d)])),
-                  ),
-                ),
-                ClipPath(
-                  clipper: WaveClipper3(),
-                  child: Container(
-                    child: Column(
-                      children: <Widget>[
-                        SizedBox(height: 30.0,),
-                        Icon(Icons.fastfood, color: Colors.white, size: 60),
-                        Text(
-                          'HaatBazaar',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 30),
+          body: Form(
+            key: _formKey,
+            autovalidate: _autoValidate,
+            child: ListView(
+              children: <Widget>[
+                ClipPaths(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                  child: Material(
+                    elevation: 2.0,
+                    borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                    child: TextFormField(
+                      keyboardType: TextInputType.phone,
+                      validator: (String value) {
+                        if (value.length != 10)
+                          return 'Mobile Number must be of 10 digit';
+                        else
+                          return null;
+                      },
+                      onSaved: (String value) {
+                        phoneNo = '+977 ' + value;
+                      },
+                      onChanged: (String value) {},
+                      cursorColor: Colors.deepOrange,
+                      decoration: InputDecoration(
+                        hintText: 'Phone',
+                        prefixIcon: Material(
+                          elevation: 0.0,
+                          borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                          child: Icon(
+                            Icons.phone_android,
+                            color: Colors.red,
+                          ),
                         ),
-                      ],
-                    ),
-                    width: double.infinity,
-                    height: 250,
-                    decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                            colors: [Color(0xffff3a5a), Color(0xfffe494d)])),
-                  ),
-                ),
-              ]),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                child: Material(
-                  elevation: 2.0,
-                  borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                  child: TextField(
-                    onChanged: (String value) {},
-                    cursorColor: Colors.deepOrange,
-                    decoration: InputDecoration(
-                      hintText: 'Phone/Email',
-                      prefixIcon: Material(
-                        elevation: 0.0,
-                        borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                        child: Icon(
-                          Icons.perm_identity,
-                          color: Colors.red,
-                        ),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(
+                            horizontal: 25.0, vertical: 13.0),
                       ),
-                      border: InputBorder.none,
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 25.0, vertical: 13.0),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                child: Material(
-                  elevation: 2.0,
-                  borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                  child: TextField(
-                    keyboardType: TextInputType.visiblePassword,
-                    onChanged: (String value) {},
-                    cursorColor: Colors.deepOrange,
-                    decoration: InputDecoration(
-                      hintText: 'Password',
-                      prefixIcon: Material(
-                        elevation: 0.0,
-                        borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                        child: Icon(
-                          Icons.lock,
-                          color: Colors.red,
+                SizedBox(
+                  height: 20,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                  child: Material(
+                    elevation: 2.0,
+                    borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                    child: TextFormField(
+                      keyboardType: TextInputType.visiblePassword,
+                      onChanged: (String value) {},
+                      cursorColor: Colors.deepOrange,
+                      decoration: InputDecoration(
+                        hintText: 'Password',
+                        prefixIcon: Material(
+                          elevation: 0.0,
+                          borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                          child: Icon(
+                            Icons.lock,
+                            color: Colors.red,
+                          ),
                         ),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(
+                            horizontal: 25.0, vertical: 13.0),
                       ),
-                      border: InputBorder.none,
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 25.0, vertical: 13.0),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(
-                height: 25,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(100.0)),
-                    color: Color(0xffff3a5a),
-                  ),
-                  child: FlatButton(
-                    child: Text(
-                      'Login',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 18.0),
-                    ),
-                    onPressed: () {},
-                  ),
+                SizedBox(
+                  height: 25,
                 ),
-              ),
-              SizedBox(
-                height: 20.0,
-              ),
-              Center(
-                child: InkWell(
-                  child: Text(
-                    'FORGOT PASSWORD ?',
-                    style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.w700),
-                  ),
-                  onTap: (){
-
-                  },
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                  child: RaisedButton(
+                      padding: EdgeInsets.symmetric(vertical: 10.0),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100.0)),
+                      color: Color(0xffff3a5a),
+                      textColor: Colors.white,
+                      child: Text(
+                        'Login',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 18.0),
+                      ),
+                      onPressed: () {
+                        _validateInputs();
+                        if (_validated) {
+                          signIn();
+                        }
+                        _validated = false;
+                      }),
                 ),
-              ),
-              SizedBox(
-                height: 25.0,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    'Don\'t have an Account?',
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.normal),
-                  ),
-                  InkWell(
+                SizedBox(
+                  height: 20.0,
+                ),
+                Center(
+                  child: InkWell(
                     child: Text(
-                      'Sign Up',
+                      'FORGOT PASSWORD ?',
                       style: TextStyle(
                           color: Colors.red,
                           fontSize: 12.0,
-                          fontWeight: FontWeight.w500,
-                          decoration: TextDecoration.underline),
+                          fontWeight: FontWeight.w700),
                     ),
-                    onTap: (){
-                          Navigator.pushNamed(context, SignUp.id);
-                    },
+                    onTap: () {},
                   ),
-
-                ],
-              )
-            ],
+                ),
+                SizedBox(
+                  height: 25.0,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      'Don\'t have an Account?',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 12.0,
+                          fontWeight: FontWeight.normal),
+                    ),
+                    InkWell(
+                      child: Text(
+                        'Register',
+                        style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.w500,
+                            decoration: TextDecoration.underline),
+                      ),
+                      onTap: () {
+                        Navigator.pushNamed(context, SignUp.id);
+                      },
+                    ),
+                  ],
+                )
+              ],
+            ),
           ),
         ),
-    ),
+      ),
     );
-  }
-}
-
-class WaveClipper1 extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    path.lineTo(0.0, size.height - 50);
-    var firstEndPoint = Offset(size.width * 0.7, size.height - 40);
-    var firstControlPoint = Offset(size.width * 0.25, size.height);
-    path.quadraticBezierTo(firstControlPoint.dx, firstControlPoint.dy,
-        firstEndPoint.dx, firstEndPoint.dy);
-    var secondEndPoint = Offset(size.width, size.height - 45);
-    var secondControlPoint = Offset(size.width * 0.84, size.height - 50);
-    path.quadraticBezierTo(secondControlPoint.dx, secondControlPoint.dy,
-        secondEndPoint.dx, secondEndPoint.dy);
-    path.lineTo(size.width, size.height);
-    path.lineTo(size.width, 0);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return false;
-  }
-}
-
-class WaveClipper2 extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    path.lineTo(0.0, size.height - 50);
-    var firstEndPoint = Offset(size.width * 0.6, size.height - 15 - 50);
-    var firstControlPoint = Offset(size.width * 0.25, size.height - 60 - 50);
-    path.quadraticBezierTo(firstControlPoint.dx, firstControlPoint.dy,
-        firstEndPoint.dx, firstEndPoint.dy);
-    var secondEndPoint = Offset(size.width, size.height - 40);
-    var secondControlPoint = Offset(size.width * 0.84, size.height - 30);
-    path.quadraticBezierTo(secondControlPoint.dx, secondControlPoint.dy,
-        secondEndPoint.dx, secondEndPoint.dy);
-    path.lineTo(size.width, size.height);
-    path.lineTo(size.width, 0);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return false;
-  }
-}
-
-class WaveClipper3 extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    path.lineTo(0.0, size.height - 50);
-    var firstEndPoint = Offset(size.width * 0.6, size.height - 29 - 50);
-    var firstControlPoint = Offset(size.width * 0.25, size.height - 60 - 50);
-    path.quadraticBezierTo(firstControlPoint.dx, firstControlPoint.dy,
-        firstEndPoint.dx, firstEndPoint.dy);
-    var secondEndPoint = Offset(size.width, size.height - 60);
-    var secondControlPoint = Offset(size.width * 0.84, size.height - 50);
-    path.quadraticBezierTo(secondControlPoint.dx, secondControlPoint.dy,
-        secondEndPoint.dx, secondEndPoint.dy);
-    path.lineTo(size.width, size.height);
-    path.lineTo(size.width, 0);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return false;
   }
 }

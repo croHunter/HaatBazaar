@@ -6,7 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:haatbazaar/Screens/Home.dart';
 import 'package:haatbazaar/Screens/wish_list.dart';
 import 'package:haatbazaar/sidebar/main_drawer.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'account.dart';
 import 'message.dart';
 
@@ -19,7 +19,8 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   int _selectedPage = 0;
   List<Widget> pageList = [];
-
+  final _auth = FirebaseAuth.instance;
+  User loggedInUser;
   @override
   void initState() {
     pageList.add(HomePage());
@@ -27,6 +28,19 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     pageList.add(WishList());
     pageList.add(Account());
     super.initState();
+    getCurrentUser();
+  }
+
+  void getCurrentUser() async {
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        loggedInUser = user;
+        print(loggedInUser.phoneNumber);
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
@@ -81,7 +95,9 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        drawer: MainDrawer(),
+        drawer: MainDrawer(
+          loggedInUser: loggedInUser.phoneNumber,
+        ),
         body: IndexedStack(
           index: _selectedPage,
           children: pageList,

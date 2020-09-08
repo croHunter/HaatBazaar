@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,7 +10,9 @@ import 'package:haatbazaar/Screens/DailyIngredientItem.dart';
 import 'package:haatbazaar/Screens/DailyVegetableItem.dart';
 import 'package:haatbazaar/Screens/cart_list.dart';
 import 'package:haatbazaar/Screens/product_detail.dart';
+import 'package:haatbazaar/admin_screen/productList.dart';
 import 'package:haatbazaar/constants.dart';
+import 'package:haatbazaar/db/product.dart';
 import 'package:haatbazaar/sidebar/main_drawer.dart';
 
 import '../Model/itemList.dart';
@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   final _auth = FirebaseAuth.instance;
   User loggedInUser;
-  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   final PageController _pageController = PageController(initialPage: 0);
   int _currentPage = 0;
   bool pageActive;
@@ -68,18 +68,6 @@ class _HomePageState extends State<HomePage>
 
   @override
   void initState() {
-    Timer.periodic(
-      Duration(seconds: 3),
-      (Timer timer) {
-        if (_currentPage < 5) {
-          _currentPage++;
-        } else {
-          _currentPage = 0;
-        }
-        _pageController.animateToPage(_currentPage,
-            duration: Duration(milliseconds: 200), curve: Curves.easeIn);
-      },
-    );
     _tabController = TabController(length: 5, vsync: this);
 
     dailyPageList.add(DailyFruitItem());
@@ -122,7 +110,8 @@ class _HomePageState extends State<HomePage>
     });
   }
 
-  Widget categoryList(BuildContext context, index, products) {
+  Widget categoryList(
+      BuildContext context, int index, List<ProductModel> products) {
     return InkWell(
       onTap: () async {
         await Navigator.push(
@@ -132,16 +121,16 @@ class _HomePageState extends State<HomePage>
               // int weight=5;
               return ProductDetail(
                 gridIndex: index,
-                name: products.data()['name'],
-                imageUrl: products.data()['imageURL'],
-                price: products.data()['price'],
-                brand: products.data()['brand'],
-                quantity: products.data()['quantity'],
-                description: products.data()['description'],
-                isOnSale: products.data()['isOnSale'],
-                isFeatured: products.data()['isFeatured'],
-                isDailyNeed: products.data()['isDailyNeed'],
-                id: products.data()['id'],
+                name: products[index].productName,
+                imageUrl: products[index].imageURL,
+                price: products[index].getPrice,
+                brand: products[index].brand,
+                quantity: products[index].quantity,
+                description: products[index].description,
+                isOnSale: products[index].isOnSale,
+                isFeatured: products[index].isFeatured,
+                isDailyNeed: products[index].isDailyNeed,
+                id: products[index].id,
               );
             },
           ),
@@ -155,7 +144,7 @@ class _HomePageState extends State<HomePage>
               borderRadius: BorderRadius.circular(10.0),
               color: Colors.black12,
               image: DecorationImage(
-                image: NetworkImage(products.data()['imageURL']),
+                image: NetworkImage(products[index].imageURL),
                 fit: BoxFit.cover,
               ),
             ),
@@ -168,11 +157,11 @@ class _HomePageState extends State<HomePage>
             height: 10.0,
           ),
           Row(children: <Widget>[
-            products.data()['isOnSale']
-                ? Text('Rs.${products.data()['price']}')
+            products[index].isOnSale
+                ? Text('Rs.${products[index].getPrice}')
                 : Text('Sold', style: TextStyle(color: Colors.red)),
             SizedBox(width: 10.0),
-            Text(products.data()['name']),
+            Text('${products[index].productName}'),
           ])
         ],
       ),
@@ -244,60 +233,59 @@ class _HomePageState extends State<HomePage>
                 ),
                 SliverToBoxAdapter(
                   child: StreamBuilder<QuerySnapshot>(
-                      stream: _firestore
-                          .collection('product')
-                          .where('isDailyNeed', isEqualTo: true)
-                          .snapshots(),
+                      stream: productServices.getDailySnaps(),
                       builder: (context, snapshot) {
                         if (snapshot.hasError) {
                           return Text('something went wrong');
-                        } else if (!snapshot.hasData) {
+                        } else if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
                           return Center(
                               child: CircularProgressIndicator(
                             backgroundColor: Colors.lightBlueAccent,
                           ));
-                        } else {
+                        } else if (snapshot.connectionState ==
+                                ConnectionState.active &&
+                            snapshot.hasData &&
+                            snapshot.data.docs.length > 0) {
+                          List<ProductModel> products =
+                              productServices.getProductModel(snapshot);
+                          print(products);
                           return Container(
                             width: double.infinity,
                             height: 250.0,
                             margin: EdgeInsets.only(top: 5.0),
                             child: ListView.builder(
                                 itemBuilder: (BuildContext context, int index) {
-                                  DocumentSnapshot products =
-                                      snapshot.data.docs[index];
                                   return categoryList(context, index, products);
                                 },
-                                itemCount: snapshot.data.docs.length,
+                                itemCount: products.length,
                                 scrollDirection: Axis.horizontal),
                           );
-                        }
+                        } else
+                          return Scaffold();
                       }),
                 ),
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: kPaddingHomeTopics,
                     child: StreamBuilder<QuerySnapshot>(
-                        stream: _firestore
-                            .collection('product')
-                            .where('isFeatured', isEqualTo: true)
-                            .snapshots(),
+                        stream: productServices.getFeaturedSnaps(),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
                             return Text('something went wrong');
-                          } else if (!snapshot.hasData) {
+                          } else if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
                             return Center(
                                 child: CircularProgressIndicator(
                               backgroundColor: Colors.lightBlueAccent,
                             ));
-                          } else {
-                            final listOfFeaturedProducts = snapshot.data.docs;
-                            List<String> listOfFeaturedUrl = [];
-                            for (var featured in listOfFeaturedProducts) {
-                              final String featuredUrl =
-                                  featured.data()['imageURL'];
-                              listOfFeaturedUrl.add(featuredUrl);
-                              // DocumentSnapshot products = snapshot.data.docs[index];
-                            }
+                          } else if (snapshot.connectionState ==
+                                  ConnectionState.active &&
+                              snapshot.hasData &&
+                              snapshot.data.docs.length > 0) {
+                            List<ProductModel> products =
+                                productServices.getProductModel(snapshot);
+                            print(products);
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
@@ -312,8 +300,7 @@ class _HomePageState extends State<HomePage>
                                           MaterialPageRoute(
                                             builder: (context) {
                                               return FeaturedProduct(
-                                                  products:
-                                                      listOfFeaturedProducts);
+                                                  products: products);
                                             },
                                           ),
                                         );
@@ -334,15 +321,15 @@ class _HomePageState extends State<HomePage>
                                             onPageChanged: _onPageChanged,
                                             scrollDirection: Axis.horizontal,
                                             controller: _pageController,
-                                            itemCount: listOfFeaturedUrl.length,
+                                            itemCount: products.length,
                                             itemBuilder: (context, index) {
                                               return Container(
                                                 decoration: BoxDecoration(
                                                     color: Colors.black12,
                                                     image: DecorationImage(
                                                         image: NetworkImage(
-                                                            listOfFeaturedUrl[
-                                                                index]),
+                                                            products[index]
+                                                                .imageURL),
                                                         fit: BoxFit.cover)),
                                               );
                                             }),
@@ -354,7 +341,8 @@ class _HomePageState extends State<HomePage>
                                 )
                               ],
                             );
-                          }
+                          } else
+                            return Scaffold();
                         }),
                   ),
                 ),

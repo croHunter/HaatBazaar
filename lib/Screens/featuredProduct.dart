@@ -1,12 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:haatbazaar/Screens/product_detail.dart';
+import 'package:haatbazaar/db/product.dart';
 
 import 'Home.dart';
 
 class FeaturedProduct extends StatefulWidget {
   FeaturedProduct({this.products});
-  final List<QueryDocumentSnapshot> products;
+  final List<ProductModel> products;
   static String id = 'featuredProduct';
   @override
   _FeaturedProductState createState() => _FeaturedProductState();
@@ -48,19 +48,16 @@ class _FeaturedProductState extends State<FeaturedProduct> {
                           // int weight=5;
                           return ProductDetail(
                             gridIndex: index,
-                            name: widget.products[index].data()['name'],
-                            imageUrl: widget.products[index].data()['imageURL'],
-                            price: widget.products[index].data()['price'],
-                            brand: widget.products[index].data()['brand'],
-                            quantity: widget.products[index].data()['quantity'],
-                            description:
-                                widget.products[index].data()['description'],
-                            isOnSale: widget.products[index].data()['isOnSale'],
-                            isFeatured:
-                                widget.products[index].data()['isFeatured'],
-                            isDailyNeed:
-                                widget.products[index].data()['isDailyNeed'],
-                            id: widget.products[index].data()['id'],
+                            name: widget.products[index].productName,
+                            imageUrl: widget.products[index].imageURL,
+                            price: widget.products[index].getPrice,
+                            brand: widget.products[index].brand,
+                            quantity: widget.products[index].quantity,
+                            description: widget.products[index].description,
+                            isOnSale: widget.products[index].isOnSale,
+                            isFeatured: widget.products[index].isFeatured,
+                            isDailyNeed: widget.products[index].isDailyNeed,
+                            id: widget.products[index].id,
                           );
                         },
                       ),
@@ -82,7 +79,7 @@ class _FeaturedProductState extends State<FeaturedProduct> {
                               color: Colors.black,
                               image: DecorationImage(
                                 image: NetworkImage(
-                                  widget.products[index].data()['imageURL'],
+                                  widget.products[index].imageURL,
                                 ),
                                 fit: BoxFit.cover,
                                 alignment: Alignment.center,
@@ -98,13 +95,13 @@ class _FeaturedProductState extends State<FeaturedProduct> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                Text(widget.products[index].data()['name'],
+                                Text(widget.products[index].productName,
                                     style: TextStyle(
                                       fontSize: 16.0,
                                     )),
-                                widget.products[index].data()['isOnSale']
+                                widget.products[index].isOnSale
                                     ? Text(
-                                        'Rs.${widget.products[index].data()['price']}',
+                                        'Rs.${widget.products[index].getPrice}',
                                         style: TextStyle(
                                           fontSize: 16.0,
                                         ))

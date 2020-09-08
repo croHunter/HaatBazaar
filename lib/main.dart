@@ -11,7 +11,6 @@ import 'package:haatbazaar/admin_screen/addPoducts.dart';
 
 import 'Authentication/SignUp.dart';
 import 'Screens/dailyTabBar.dart';
-import 'Screens/featuredProduct.dart';
 import 'Screens/message.dart';
 import 'Screens/wish_list.dart';
 import 'admin_screen/admin.dart';

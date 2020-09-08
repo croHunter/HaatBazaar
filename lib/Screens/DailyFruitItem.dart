@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:haatbazaar/Screens/product_detail.dart';
+import 'package:haatbazaar/admin_screen/productList.dart';
+import 'package:haatbazaar/db/product.dart';
 
 import 'Home.dart';
 
@@ -10,25 +12,24 @@ class DailyFruitItem extends StatefulWidget {
 }
 
 class _DailyFruitItemState extends State<DailyFruitItem> {
-  FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-        stream: _firestore
-            .collection('product')
-            .where('category', isEqualTo: 'Fruit')
-            .snapshots(),
+        stream: productServices.getFruitSnaps(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Text('something went wrong');
-          } else if (!snapshot.hasData ||
-              snapshot.connectionState == ConnectionState.waiting) {
+          } else if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
                 child: CircularProgressIndicator(
               backgroundColor: Colors.lightBlueAccent,
             ));
-          } else {
+          } else if (snapshot.connectionState == ConnectionState.active &&
+              snapshot.hasData &&
+              snapshot.data.docs.length > 0) {
+            List<ProductModel> products =
+                productServices.getProductModel(snapshot);
+            print(products);
             return Container(
               margin: EdgeInsets.symmetric(horizontal: 5.0),
               child: GridView.count(
@@ -41,9 +42,8 @@ class _DailyFruitItemState extends State<DailyFruitItem> {
                 shrinkWrap: true,
                 scrollDirection: Axis.vertical,
                 children: List<Widget>.generate(
-                  snapshot.data.docs.length,
+                  products.length,
                   (index) {
-                    DocumentSnapshot products = snapshot.data.docs[index];
                     return InkWell(
                       onTap: () async {
                         await Navigator.push(
@@ -53,16 +53,16 @@ class _DailyFruitItemState extends State<DailyFruitItem> {
                               // int weight=5;
                               return ProductDetail(
                                 gridIndex: index,
-                                name: products.data()['name'],
-                                imageUrl: products.data()['imageURL'],
-                                price: products.data()['price'],
-                                brand: products.data()['brand'],
-                                quantity: products.data()['quantity'],
-                                description: products.data()['description'],
-                                isOnSale: products.data()['isOnSale'],
-                                isFeatured: products.data()['isFeatured'],
-                                isDailyNeed: products.data()['isDailyNeed'],
-                                id: products.data()['id'],
+                                name: products[index].productName,
+                                imageUrl: products[index].imageURL,
+                                price: products[index].getPrice,
+                                brand: products[index].brand,
+                                quantity: products[index].quantity,
+                                description: products[index].description,
+                                isOnSale: products[index].isOnSale,
+                                isFeatured: products[index].isFeatured,
+                                isDailyNeed: products[index].isDailyNeed,
+                                id: products[index].id,
                               );
                             },
                           ),
@@ -81,7 +81,7 @@ class _DailyFruitItemState extends State<DailyFruitItem> {
                             Expanded(
                               flex: 2,
                               child: Hero(
-                                tag: 'item${index}',
+                                tag: 'item$index',
                                 child: Container(
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.only(
@@ -90,7 +90,7 @@ class _DailyFruitItemState extends State<DailyFruitItem> {
                                     color: Colors.black,
                                     image: DecorationImage(
                                       image: NetworkImage(
-                                        products.data()['imageURL'],
+                                        products[index].imageURL,
                                       ),
                                       fit: BoxFit.cover,
                                       alignment: Alignment.center,
@@ -107,20 +107,19 @@ class _DailyFruitItemState extends State<DailyFruitItem> {
                                         CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
-                                      Text(products.data()['name'],
+                                      Text(products[index].productName,
                                           style: TextStyle(
                                             fontSize: 16.0,
                                           )),
-                                      products.data()['isOnSale']
-                                          ?Text(
-                                          'Rs.${products.data()['price']}',
-                                          style: TextStyle(
-                                            fontSize: 16.0,
-                                          ))
-                                          :  Text('Sold',
-                                          style:
-                                          TextStyle(color: Colors.red))
-
+                                      products[index].isOnSale
+                                          ? Text(
+                                              'Rs.${products[index].getPrice}',
+                                              style: TextStyle(
+                                                fontSize: 16.0,
+                                              ))
+                                          : Text('Sold',
+                                              style:
+                                                  TextStyle(color: Colors.red))
                                     ],
                                   ),
                                   Spacer(),
@@ -167,21 +166,9 @@ class _DailyFruitItemState extends State<DailyFruitItem> {
                 ),
               ),
             );
-          }
+          } else
+            return Scaffold();
         });
     // GridViewCount();
   }
 }
-
-// Container(
-// width: double.infinity,
-// height: 150.0,
-// margin: EdgeInsets.only(top: 10.0),
-// child: ListView.builder(
-// itemBuilder: (BuildContext context, int index) {
-// return categoryList(
-// context, index, listOfFeaturedUrl);
-// },
-// itemCount: listOfFeaturedUrl.length,
-// scrollDirection: Axis.horizontal),
-// );

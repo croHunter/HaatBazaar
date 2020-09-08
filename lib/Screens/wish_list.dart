@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:haatbazaar/RefactorComponent/CWClearItemButton.dart';
@@ -23,6 +21,7 @@ class _WishListState extends State<WishList> {
   void initState() {
 //    _event1.add(0);
     super.initState();
+    setState(() {});
   }
 
   @override

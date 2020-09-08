@@ -1,14 +1,35 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'conform_order.dart';
+
 import 'Home.dart';
+import 'conform_order.dart';
 
 class ProductDetail extends StatefulWidget {
-  ProductDetail({
-    this.gridIndex,
-  });
+  ProductDetail(
+      {this.gridIndex,
+      this.name,
+      this.imageUrl,
+      this.price,
+      this.brand,
+      this.quantity,
+      this.description,
+      this.isOnSale,
+      this.isFeatured,
+      this.isDailyNeed,
+      this.id});
   final int gridIndex;
+  final String name;
+  final String imageUrl;
+  final double price;
+  final String brand;
+  final double quantity;
+  final String description;
+  final bool isOnSale;
+  final bool isFeatured;
+  final bool isDailyNeed;
+  final String id;
+
   @override
   _ProductDetailState createState() => _ProductDetailState();
 }
@@ -30,8 +51,8 @@ class _ProductDetailState extends State<ProductDetail>
             width: double.infinity,
             child: Hero(
               tag: 'item${widget.gridIndex}',
-              child: Image.asset(
-                itemList.assetImage(widget.gridIndex),
+              child: Image.network(
+                widget.imageUrl,
                 fit: BoxFit.cover,
               ),
             ),
@@ -51,7 +72,7 @@ class _ProductDetailState extends State<ProductDetail>
                     Padding(
                       padding: const EdgeInsets.only(left: 10.0),
                       child: Text(
-                        '${itemList.imageName(widget.gridIndex)}',
+                        '${widget.name}',
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 28.0,
@@ -98,9 +119,11 @@ class _ProductDetailState extends State<ProductDetail>
                           Spacer(),
                           Column(
                             children: <Widget>[
-                              Text('Total'),
-                              Text(
-                                  'Rs.${weight * itemList.price(widget.gridIndex)}'),
+                              widget.isOnSale
+                                  ? Text('Total')
+                                  : Text('Sold',
+                                      style: TextStyle(color: Colors.red)),
+                              Text('Rs.${weight * widget.price}'),
                             ],
                           ),
                         ],
@@ -132,7 +155,7 @@ class _ProductDetailState extends State<ProductDetail>
                         ),
                       ),
                       Text(
-                        'DESCRIPTION',
+                        "description",
                         style: TextStyle(
                           fontSize: 14.0,
                           fontWeight: FontWeight.w600,
@@ -142,7 +165,7 @@ class _ProductDetailState extends State<ProductDetail>
                         height: 10.0,
                       ),
                       Text(
-                        'This is the best product in the hystrory my name is sujan shrestha i live in nepal This is the best product in the hystrory my name is sujan shrestha i live in nepalThis is the best product in the hystrory my name is sujan shrestha i live in nepal This is the best product in the hystrory my name is sujan shrestha i live in nepalThis is the best product in the hystrory my name is sujan shrestha i live in nepal This is the best product in the hystrory my name is sujan shrestha i live in nepalThis is the best product in the hystrory my name is sujan shrestha i live in nepal This is the best product in the hystrory my name is sujan shrestha i live in nepalThis is the best product in the hystrory my name is sujan shrestha i live in nepal This is the best product in the hystrory my name is sujan shrestha i live in nepalThis is the best product in the hystrory my name i my name is sujan shrestha i live in nepal This is the best product in the hystrory my name is sujan shrestha i live in nepalThis is the best product in the hystrory my name is sujan shrestha i live in nepal This is the best product in ttrory my name is sujan shrestha i live in nepal',
+                        "${widget.description}",
                         style: TextStyle(
                           fontSize: 14.0,
                           fontWeight: FontWeight.w300,
@@ -201,7 +224,7 @@ class _ProductDetailState extends State<ProductDetail>
                         color: Colors.purple,
                         borderRadius: BorderRadius.circular(5.0)),
                     child: Text(
-                      'Rs.${itemList.price(widget.gridIndex)}/kg',
+                      'Rs.${widget.price}/kg',
                       style: TextStyle(
                           fontSize: 12.0,
                           fontWeight: FontWeight.normal,

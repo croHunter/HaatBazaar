@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -8,15 +10,15 @@ import 'package:haatbazaar/Model/slideItemList.dart';
 import 'package:haatbazaar/Screens/DailyAnnaItem.dart';
 import 'package:haatbazaar/Screens/DailyIngredientItem.dart';
 import 'package:haatbazaar/Screens/DailyVegetableItem.dart';
+import 'package:haatbazaar/Screens/cart_list.dart';
+import 'package:haatbazaar/Screens/product_detail.dart';
 import 'package:haatbazaar/constants.dart';
-import 'package:haatbazaar/imageSlider/SlideItem.dart';
-import 'package:haatbazaar/imageSlider/slideDots.dart';
 import 'package:haatbazaar/sidebar/main_drawer.dart';
 
 import '../Model/itemList.dart';
 import 'DailyFruitItem.dart';
 import 'Dairy.dart';
-import 'cart_list.dart';
+import 'featuredProduct.dart';
 
 ItemList itemList = ItemList();
 SlideItemList slideItemList = SlideItemList();
@@ -30,6 +32,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
+  final _auth = FirebaseAuth.instance;
+  User loggedInUser;
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final PageController _pageController = PageController(initialPage: 0);
   int _currentPage = 0;
   bool pageActive;
@@ -60,12 +65,13 @@ class _HomePageState extends State<HomePage>
       }
     });
   }
+
   @override
   void initState() {
     Timer.periodic(
       Duration(seconds: 3),
       (Timer timer) {
-        if (_currentPage < slideItemList.slideItemLength()) {
+        if (_currentPage < 5) {
           _currentPage++;
         } else {
           _currentPage = 0;
@@ -82,7 +88,25 @@ class _HomePageState extends State<HomePage>
     dailyPageList.add(DailyAnnaItem());
     dailyPageList.add(DailyDairyItem());
     super.initState();
+    getCurrentUser();
     isSearching = false;
+  }
+
+  void getCurrentUser() async {
+    try {
+      print('sj1');
+      final user = _auth.currentUser;
+      print(user);
+      print('sj2');
+      if (user != null) {
+        loggedInUser = user;
+        //  print(loggedInUser.phoneNumber);
+        print(loggedInUser);
+      }
+    } catch (e) {
+      print("second last error : $e");
+    }
+    print("here is error");
   }
 
   @override
@@ -98,9 +122,32 @@ class _HomePageState extends State<HomePage>
     });
   }
 
-  Widget categoryList(BuildContext context, index) {
+  Widget categoryList(BuildContext context, index, products) {
     return InkWell(
-      onTap: () {},
+      onTap: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              // int weight=5;
+              return ProductDetail(
+                gridIndex: index,
+                name: products.data()['name'],
+                imageUrl: products.data()['imageURL'],
+                price: products.data()['price'],
+                brand: products.data()['brand'],
+                quantity: products.data()['quantity'],
+                description: products.data()['description'],
+                isOnSale: products.data()['isOnSale'],
+                isFeatured: products.data()['isFeatured'],
+                isDailyNeed: products.data()['isDailyNeed'],
+                id: products.data()['id'],
+              );
+            },
+          ),
+        );
+        setState(() {});
+      },
       child: Column(
         children: <Widget>[
           Container(
@@ -108,19 +155,25 @@ class _HomePageState extends State<HomePage>
               borderRadius: BorderRadius.circular(10.0),
               color: Colors.black12,
               image: DecorationImage(
-                image: AssetImage(itemList.assetImage(index)),
+                image: NetworkImage(products.data()['imageURL']),
                 fit: BoxFit.cover,
               ),
             ),
             alignment: Alignment.center,
-            margin: EdgeInsets.symmetric(horizontal: 10.0),
-            width: 100.0,
-            height: 100.0,
+            margin: EdgeInsets.symmetric(horizontal: 5.0),
+            width: 160.0,
+            height: 200.0,
           ),
           SizedBox(
             height: 10.0,
           ),
-          Text(itemList.imageName(index)),
+          Row(children: <Widget>[
+            products.data()['isOnSale']
+                ? Text('Rs.${products.data()['price']}')
+                : Text('Sold', style: TextStyle(color: Colors.red)),
+            SizedBox(width: 10.0),
+            Text(products.data()['name']),
+          ])
         ],
       ),
     );
@@ -132,12 +185,11 @@ class _HomePageState extends State<HomePage>
       color: Colors.red,
       child: SafeArea(
         child: Scaffold(
-//      appBar: _showAppbar
-//          ? buildAppBar(context)
-//          : PreferredSize(
-//              child: Container(),
-//              preferredSize: Size(0.0, 0.0),
-//            ),
+          drawer: MainDrawer(
+            auth: _auth,
+            loggedInUser:
+                loggedInUser != null ? loggedInUser.phoneNumber : 'Unknown',
+          ),
           body: NestedScrollView(
 //        controller: _scrollController,
             headerSliverBuilder: (context, value) {
@@ -187,79 +239,123 @@ class _HomePageState extends State<HomePage>
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: kPaddingHomeTopics,
-                    child: Text('CATEGORIES'),
+                    child: Text('DAILY NEEDS'),
                   ),
                 ),
                 SliverToBoxAdapter(
-                  child: Container(
-                    width: double.infinity,
-                    height: 150.0,
-                    margin: EdgeInsets.only(top: 10.0),
-                    child: ListView.builder(
-                        itemBuilder: (BuildContext context, int index) {
-                          return categoryList(context, index);
-                        },
-                        itemCount: itemList.itemLength(),
-                        scrollDirection: Axis.horizontal),
-                  ),
+                  child: StreamBuilder<QuerySnapshot>(
+                      stream: _firestore
+                          .collection('product')
+                          .where('isDailyNeed', isEqualTo: true)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return Text('something went wrong');
+                        } else if (!snapshot.hasData) {
+                          return Center(
+                              child: CircularProgressIndicator(
+                            backgroundColor: Colors.lightBlueAccent,
+                          ));
+                        } else {
+                          return Container(
+                            width: double.infinity,
+                            height: 250.0,
+                            margin: EdgeInsets.only(top: 5.0),
+                            child: ListView.builder(
+                                itemBuilder: (BuildContext context, int index) {
+                                  DocumentSnapshot products =
+                                      snapshot.data.docs[index];
+                                  return categoryList(context, index, products);
+                                },
+                                itemCount: snapshot.data.docs.length,
+                                scrollDirection: Axis.horizontal),
+                          );
+                        }
+                      }),
                 ),
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: kPaddingHomeTopics,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            Text('FEATURED PRODUCT'),
-                            Spacer(),
-                            InkWell(
-                              onTap: () {},
-                              child: Text('View all'),
-                            )
-                          ],
-                        ),
-                        Container(
-                          height: 160.0,
-                          width: double.infinity,
-                          margin: EdgeInsets.symmetric(vertical: 10.0),
-                          child: Stack(
-                              alignment: AlignmentDirectional.bottomCenter,
+                    child: StreamBuilder<QuerySnapshot>(
+                        stream: _firestore
+                            .collection('product')
+                            .where('isFeatured', isEqualTo: true)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            return Text('something went wrong');
+                          } else if (!snapshot.hasData) {
+                            return Center(
+                                child: CircularProgressIndicator(
+                              backgroundColor: Colors.lightBlueAccent,
+                            ));
+                          } else {
+                            final listOfFeaturedProducts = snapshot.data.docs;
+                            List<String> listOfFeaturedUrl = [];
+                            for (var featured in listOfFeaturedProducts) {
+                              final String featuredUrl =
+                                  featured.data()['imageURL'];
+                              listOfFeaturedUrl.add(featuredUrl);
+                              // DocumentSnapshot products = snapshot.data.docs[index];
+                            }
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                PageView.builder(
-                                    onPageChanged: _onPageChanged,
-                                    scrollDirection: Axis.horizontal,
-                                    controller: _pageController,
-                                    itemCount: slideItemList.slideItemLength(),
-                                    itemBuilder: (context, index) {
-                                      return SlideItem(
-                                        index: index,
-                                      );
-                                    }),
-                                Container(
-                                  height: 12,
-                                  margin: EdgeInsets.only(left: 55.0),
-                                  child: ListView.builder(
-                                      itemBuilder: (ctx, i) {
-                                        if (i == _currentPage) {
-                                          pageActive = true;
-                                        } else {
-                                          pageActive = false;
-                                        }
-                                        return SlideDots(isActive: pageActive);
+                                Row(
+                                  children: <Widget>[
+                                    Text('FEATURED PRODUCT'),
+                                    Spacer(),
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) {
+                                              return FeaturedProduct(
+                                                  products:
+                                                      listOfFeaturedProducts);
+                                            },
+                                          ),
+                                        );
                                       },
-                                      itemCount:
-                                          slideItemList.slideItemLength(),
-                                      scrollDirection: Axis.horizontal),
+                                      child: Text('View all'),
+                                    )
+                                  ],
+                                ),
+                                Container(
+                                  height: 160.0,
+                                  width: double.infinity,
+                                  margin: EdgeInsets.symmetric(vertical: 10.0),
+                                  child: Stack(
+                                      alignment:
+                                          AlignmentDirectional.bottomCenter,
+                                      children: <Widget>[
+                                        PageView.builder(
+                                            onPageChanged: _onPageChanged,
+                                            scrollDirection: Axis.horizontal,
+                                            controller: _pageController,
+                                            itemCount: listOfFeaturedUrl.length,
+                                            itemBuilder: (context, index) {
+                                              return Container(
+                                                decoration: BoxDecoration(
+                                                    color: Colors.black12,
+                                                    image: DecorationImage(
+                                                        image: NetworkImage(
+                                                            listOfFeaturedUrl[
+                                                                index]),
+                                                        fit: BoxFit.cover)),
+                                              );
+                                            }),
+                                      ]),
+                                ),
+                                Text('CATEGORIES'),
+                                SizedBox(
+                                  height: 10.0,
                                 )
-                              ]),
-                        ),
-                        Text('DAILY NEEDS'),
-                        SizedBox(
-                          height: 10.0,
-                        )
-                      ],
-                    ),
+                              ],
+                            );
+                          }
+                        }),
                   ),
                 ),
                 SliverPersistentHeader(

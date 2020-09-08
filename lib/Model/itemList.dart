@@ -1,5 +1,14 @@
 import 'imageBank.dart';
 
+// 'name': productName,
+// 'id': _productId,
+// 'brand': brand,
+// 'category': category,
+// 'quantity': quantity,
+// 'imageURL': imageURL,
+// 'price': price,
+// 'isDailyNeed': isDailyNeed,
+// 'isFeatured': isFeatured
 class ItemList {
   //for item list
   List<ImageBank> _itemList = [

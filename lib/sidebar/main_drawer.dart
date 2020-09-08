@@ -1,12 +1,22 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:haatbazaar/Authentication/SignIn.dart';
 import 'package:haatbazaar/Screens/Home.dart';
 import 'package:haatbazaar/Screens/account.dart';
+import 'package:haatbazaar/Screens/dashboard.dart';
 import 'package:haatbazaar/Screens/wish_list.dart';
+import 'package:haatbazaar/admin_screen/admin.dart';
 
-class MainDrawer extends StatelessWidget {
-  MainDrawer({this.loggedInUser});
+class MainDrawer extends StatefulWidget {
+  MainDrawer({this.loggedInUser, this.auth});
+  final FirebaseAuth auth;
   final String loggedInUser;
+
+  @override
+  _MainDrawerState createState() => _MainDrawerState();
+}
+
+class _MainDrawerState extends State<MainDrawer> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -35,21 +45,13 @@ class MainDrawer extends StatelessWidget {
                       ),
                       radius: 50.0,
                     ),
-                    loggedInUser != null
-                        ? Text(
-                            loggedInUser,
-                            style: TextStyle(
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          )
-                        : Text(
-                            'Unknown',
-                            style: TextStyle(
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          ),
+                    Text(
+                      widget.loggedInUser,
+                      style: TextStyle(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                    ),
                     Text(
                       '(Customer)'.toUpperCase(),
                       style: TextStyle(
@@ -58,10 +60,13 @@ class MainDrawer extends StatelessWidget {
                           letterSpacing: 2.5,
                           color: Colors.black45),
                     ),
-                    loggedInUser != null
+                    widget.loggedInUser != 'Unknown'
                         ? FlatButton(
                             onPressed: () {
-                              Navigator.pushNamed(context, SignIn.id);
+                              setState(() {
+                                widget.auth.signOut();
+                              });
+                              Navigator.pushNamed(context, Dashboard.id);
                             },
                             child: Text(
                               'Logout',
@@ -115,6 +120,13 @@ class MainDrawer extends StatelessWidget {
               title: 'Settings',
               icon: Icons.settings,
               onPressed: () {},
+            ),
+            ListFlatButton(
+              title: 'Admin',
+              icon: Icons.person_pin,
+              onPressed: () {
+                Navigator.pushNamed(context, Admin.id);
+              },
             ),
           ],
         ),

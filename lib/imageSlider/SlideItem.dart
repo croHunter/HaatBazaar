@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../Screens/Home.dart';
 
 class SlideItem extends StatelessWidget {

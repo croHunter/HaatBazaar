@@ -1,12 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:haatbazaar/Screens/product_detail.dart';
+
 import 'Home.dart';
 
 class DailyItem extends StatefulWidget {
-  DailyItem({
-    this.gridIndex,
-  });
+  DailyItem(
+      {this.gridIndex,
+      this.name,
+      this.imageUrl,
+      this.price,
+      this.brand,
+      this.quantity,
+      this.isOnSale,
+      this.isFeatured,
+      this.isDailyNeed,
+      this.id});
+  final String name;
   final int gridIndex;
+  final String imageUrl;
+  final double price;
+  final String brand;
+  final double quantity;
+  final bool isOnSale;
+  final bool isFeatured;
+  final bool isDailyNeed;
+  final String id;
   @override
   _DailyItemState createState() => _DailyItemState();
 }
@@ -15,8 +33,8 @@ class _DailyItemState extends State<DailyItem> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        Navigator.push(
+      onTap: () async {
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) {
@@ -27,6 +45,7 @@ class _DailyItemState extends State<DailyItem> {
             },
           ),
         );
+        setState(() {});
       },
       child: Material(
         color: Colors.white70,
@@ -38,25 +57,26 @@ class _DailyItemState extends State<DailyItem> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Expanded(
-                flex: 2,
-                child: Hero(
-                  tag: 'item${widget.gridIndex}',
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(10.0),
-                          topRight: Radius.circular(10.0)),
-                      color: Colors.black,
-                      image: DecorationImage(
-                        image: AssetImage(
-                          itemList.assetImage(widget.gridIndex),
-                        ),
-                        fit: BoxFit.cover,
-                        alignment: Alignment.center,
+              flex: 2,
+              child: Hero(
+                tag: 'item${widget.gridIndex}',
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(10.0),
+                        topRight: Radius.circular(10.0)),
+                    color: Colors.black,
+                    image: DecorationImage(
+                      image: NetworkImage(
+                        widget.imageUrl,
                       ),
+                      fit: BoxFit.cover,
+                      alignment: Alignment.center,
                     ),
                   ),
-                )),
+                ),
+              ),
+            ),
             Expanded(
               child: Row(
                 children: <Widget>[
@@ -64,12 +84,12 @@ class _DailyItemState extends State<DailyItem> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Text(itemList.imageName(widget.gridIndex),
+                      Text(widget.name,
                           style: TextStyle(
                             fontSize: 16.0,
                           )),
                       Text(
-                        'Rs.${itemList.price(widget.gridIndex)}/kg',
+                        'Rs.${widget.price}/kg',
                         style: TextStyle(
                           fontSize: 16.0,
                         ),

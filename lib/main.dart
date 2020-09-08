@@ -1,17 +1,21 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:haatbazaar/Authentication/SignIn.dart';
 import 'package:haatbazaar/Screens/Home.dart';
 import 'package:haatbazaar/Screens/account.dart';
 import 'package:haatbazaar/Screens/cart_list.dart';
 import 'package:haatbazaar/Screens/conform_order.dart';
 import 'package:haatbazaar/Screens/dashboard.dart';
-import 'package:haatbazaar/Authentication/SignIn.dart';
 import 'package:haatbazaar/Screens/materialsplashscreen.dart';
+import 'package:haatbazaar/admin_screen/addPoducts.dart';
+
 import 'Authentication/SignUp.dart';
 import 'Screens/dailyTabBar.dart';
+import 'Screens/featuredProduct.dart';
 import 'Screens/message.dart';
 import 'Screens/wish_list.dart';
 import 'admin_screen/admin.dart';
+import 'admin_screen/productList.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,12 +33,14 @@ class HaatBazaar extends StatelessWidget {
         primaryColor: Colors.redAccent,
         scaffoldBackgroundColor: Colors.white,
       ),
-//      initialRoute: Admin.id,
-      //initialRoute: SplashScreen.id,
-      initialRoute: Dashboard.id,
+      // initialRoute: Admin.id,
+      initialRoute: SplashScreen.id,
+      // initialRoute: Dashboard.id,
+      // initialRoute: HomePage.id,
 
       routes: {
         Admin.id: (context) => Admin(),
+        AddProducts.id: (context) => AddProducts(),
         SplashScreen.id: (context) => SplashScreen(),
         Dashboard.id: (context) => Dashboard(),
         Account.id: (context) => Account(),
@@ -46,6 +52,7 @@ class HaatBazaar extends StatelessWidget {
         WishList.id: (context) => WishList(),
         DailyTabBar.id: (context) => DailyTabBar(),
         Message.id: (context) => Message(),
+        ProductList.id: (context) => ProductList(),
       },
     );
   }

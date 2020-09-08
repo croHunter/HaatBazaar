@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:haatbazaar/admin_screen/addPoducts.dart';
+import 'package:haatbazaar/admin_screen/productList.dart';
+import 'package:haatbazaar/db/brand.dart';
+import 'package:haatbazaar/db/category.dart';
+import 'package:toast/toast.dart';
 
 enum Page { dashboard, manage }
 
@@ -22,30 +27,29 @@ class _AdminState extends State<Admin> {
       appBar: AppBar(
         title: Row(
           children: <Widget>[
-            Expanded(
-              child: FlatButton.icon(
-                onPressed: () {
+            InkWell(
+                onTap: () {
                   setState(() {
                     _selectedPage = Page.dashboard;
                   });
                 },
-                icon: Icon(Icons.dashboard,
-                    color: _selectedPage == Page.dashboard ? active : noActive),
-                label: Text('Dashboard'),
-              ),
-            ),
-            Expanded(
-              child: FlatButton.icon(
-                onPressed: () {
+                child: Row(children: <Widget>[
+                  Icon(Icons.dashboard,
+                      color:
+                          _selectedPage == Page.dashboard ? active : noActive),
+                  Text('Dashboard', style: TextStyle(color: Colors.black))
+                ])),
+            InkWell(
+                onTap: () {
                   setState(() {
                     _selectedPage = Page.manage;
                   });
                 },
-                icon: Icon(Icons.sort,
-                    color: _selectedPage == Page.manage ? active : noActive),
-                label: Text('Manage'),
-              ),
-            ),
+                child: Row(children: <Widget>[
+                  Icon(Icons.developer_mode,
+                      color: _selectedPage == Page.manage ? active : noActive),
+                  Text('Manage', style: TextStyle(color: Colors.black))
+                ])),
           ],
         ),
         backgroundColor: Colors.white,
@@ -97,9 +101,11 @@ class _AdminState extends State<Admin> {
         key: _categoryFormKey,
         child: TextFormField(
           controller: categoryController,
-          validator: (value) {
+          validator: (String value) {
             if (value.isEmpty) {
-              print('dfsf');
+              return 'fill the text';
+            } else {
+              return null;
             }
           },
           decoration: InputDecoration(hintText: 'add category'),
@@ -107,7 +113,15 @@ class _AdminState extends State<Admin> {
       ),
       actions: <Widget>[
         FlatButton(
-          onPressed: () {},
+          onPressed: () {
+            if (categoryController.text.isNotEmpty) {
+              CategoryServices().createCategory(categoryController.text);
+              Toast.show('${categoryController.text} is added', context);
+              Navigator.pop(context);
+            } else {
+              Toast.show('fill in the blanks', context);
+            }
+          },
           child: Text('ADD'),
         ),
         FlatButton(
@@ -129,7 +143,9 @@ class _AdminState extends State<Admin> {
           controller: brandController,
           validator: (value) {
             if (value.isEmpty) {
-              print('dfsf');
+              return 'fill the text';
+            } else {
+              return null;
             }
           },
           decoration: InputDecoration(hintText: 'add brand'),
@@ -137,7 +153,15 @@ class _AdminState extends State<Admin> {
       ),
       actions: <Widget>[
         FlatButton(
-          onPressed: () {},
+          onPressed: () {
+            if (brandController.text.isNotEmpty) {
+              BrandServices().createBrand(brandController.text);
+              Toast.show('${brandController.text} is added', context);
+              Navigator.pop(context);
+            } else {
+              Toast.show('fill in the blanks', context);
+            }
+          },
           child: Text('ADD'),
         ),
         FlatButton(
@@ -206,13 +230,17 @@ class _AdminState extends State<Admin> {
           ListTile(
             leading: Icon(Icons.add),
             title: Text('Add product'),
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, AddProducts.id);
+            },
           ),
           Divider(),
           ListTile(
             leading: Icon(Icons.filter_list),
             title: Text('Product list'),
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, ProductList.id);
+            },
           ),
           Divider(),
           ListTile(

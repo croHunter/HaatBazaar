@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -68,6 +70,18 @@ class _HomePageState extends State<HomePage>
 
   @override
   void initState() {
+    Timer.periodic(
+      Duration(seconds: 3),
+      (Timer timer) {
+        if (_currentPage < noOFFeaturedProducts) {
+          _currentPage++;
+        } else {
+          _currentPage = 0;
+        }
+        _pageController.animateToPage(_currentPage,
+            duration: Duration(milliseconds: 200), curve: Curves.easeIn);
+      },
+    );
     _tabController = TabController(length: 5, vsync: this);
 
     dailyPageList.add(DailyFruitItem());
@@ -105,10 +119,10 @@ class _HomePageState extends State<HomePage>
   }
 
   _onPageChanged(int index) {
-    setState(() {
-      _currentPage = index;
-    });
+    _currentPage = index;
   }
+
+  int noOFFeaturedProducts;
 
   Widget categoryList(
       BuildContext context, int index, List<ProductModel> products) {
@@ -190,39 +204,26 @@ class _HomePageState extends State<HomePage>
                   floating: true,
                   actions: <Widget>[
                     GestureDetector(
-                      child: icon,
                       onTap: () {
-                        setState(() {
-                          if (this.icon.icon == Icons.search) {
-                            this.icon = Icon(
-                              Icons.close,
-                              color: Colors.white,
-                            );
-                            this.appBarTitle = TextField(
-                              style: TextStyle(
-                                color: Colors.white,
-                              ),
-                              decoration: InputDecoration(
-                                  prefixIcon:
-                                      Icon(Icons.search, color: Colors.white),
-                                  hintText: 'Search...',
-                                  hintStyle: TextStyle(color: Colors.white)),
-                              onChanged: null,
-                            );
-                            _handleSearchStart();
-                          } else {
-                            _handleSearchEnd();
-                          }
-                        });
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.add_shopping_cart),
-                      onPressed: () {
                         Navigator.pushNamed(context, CartList.id);
                       },
-                      iconSize: 22,
-                    )
+                      child: Icon(Icons.add_shopping_cart),
+                    ),
+                    SizedBox(
+                      width: 10.0,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        showSearch(
+                            context: context,
+                            delegate: ProductSearch(
+                                products: productServices.getProducts()));
+                      },
+                      child: Icon(
+                        Icons.search,
+                        size: 28.0,
+                      ),
+                    ),
                   ],
                 ),
                 SliverToBoxAdapter(
@@ -285,6 +286,7 @@ class _HomePageState extends State<HomePage>
                               snapshot.data.docs.length > 0) {
                             List<ProductModel> products =
                                 productServices.getProductModel(snapshot);
+                            noOFFeaturedProducts = products.length;
                             print(products);
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,28 +398,122 @@ class _HomePageState extends State<HomePage>
       ),
     );
   }
+}
 
-  void _handleSearchStart() {
-    setState(() {
-      isSearching = true;
-    });
+class ProductSearch extends SearchDelegate<String> {
+  ProductSearch({this.products});
+  final List<ProductModel> products;
+  List<String> history = [];
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    // TODO: implement buildActions
+    //action for search bar
+    return [
+      IconButton(
+        icon: Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      )
+    ];
+    throw UnimplementedError();
   }
 
-  void _handleSearchEnd() {
-    setState(() {
-      this.icon = Icon(
-        Icons.search,
-        color: Colors.white,
-      );
-      this.appBarTitle = Text(
-        'HaatBazaar',
-        style: TextStyle(color: Colors.white),
-      );
-      isSearching = false;
-      _controller.clear();
-    });
+  @override
+  Widget buildLeading(BuildContext context) {
+    // TODO: implement buildLeading
+
+    //leading icon on the left of the app bar
+    return IconButton(
+      icon: AnimatedIcon(
+        icon: AnimatedIcons.menu_arrow,
+        progress: transitionAnimation,
+      ),
+      onPressed: () {
+        close(context, null);
+      },
+    );
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget buildResults(
+    BuildContext context,
+  ) {
+    // TODO: implement buildResults
+    //show some result best on the selection
+    return Center(child: Text('please select the products'));
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    // TODO: implement buildSuggestions
+
+    //show when someone searches for something
+    List<String> suggestionLists = query.isEmpty
+        ? history
+        : products
+            .map((e) => e.productName)
+            .where((element) => element.startsWith(
+                query.substring(0, 1).toUpperCase() + query.substring(1)))
+            .toList();
+    print(suggestionLists);
+
+    // print("before: $products");
+    // products.where((element) => suggestionLists.contains(element.productName))
+    // print("after: $products");
+
+    return ListView.builder(
+      itemBuilder: (context, index) {
+        return ListTile(
+          onTap: () async {
+            history.add(suggestionLists[index]);
+            List<ProductModel> product =
+                await productServices.getProductByName(suggestionLists[index]);
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) {
+                // int weight=5;
+                return ProductDetail(
+                  gridIndex: index,
+                  name: product[index].productName,
+                  imageUrl: product[index].imageURL,
+                  price: product[index].getPrice,
+                  brand: product[index].brand,
+                  quantity: product[index].quantity,
+                  description: product[index].description,
+                  isOnSale: product[index].isOnSale,
+                  isFeatured: product[index].isFeatured,
+                  isDailyNeed: product[index].isDailyNeed,
+                  id: product[index].id,
+                );
+              }),
+            ); // showResults(context);
+          },
+          leading: Icon(Icons.filter_list),
+          title: RichText(
+            text: TextSpan(
+                text: '${suggestionLists[index].substring(0, query.length)}',
+                style:
+                    TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                children: [
+                  TextSpan(
+                    text: suggestionLists[index].substring(query.length),
+                    style: TextStyle(color: Colors.grey),
+                  )
+                ]),
+          ),
+        );
+      },
+      itemCount: suggestionLists.length,
+    );
+    throw UnimplementedError();
   }
 }
+/*---------------------------------------------------------------------------*/
 
 class _CustomTabBar implements SliverPersistentHeaderDelegate {
   _CustomTabBar({this.child});

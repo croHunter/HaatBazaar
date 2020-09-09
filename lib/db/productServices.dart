@@ -99,4 +99,28 @@ class ProductServices {
     }
     return products;
   }
+
+  List<ProductModel> getProducts() {
+    List<ProductModel> products = [];
+    _firestore.collection(_tableName).get().then((result) {
+      for (DocumentSnapshot product in result.docs) {
+        products.add(ProductModel.fromSnapshot(product));
+      }
+    });
+    return products;
+  }
+
+  Future<List<ProductModel>> getProductByName(String value) async {
+    List<ProductModel> products = [];
+    await _firestore
+        .collection(_tableName)
+        .where('name', isEqualTo: value)
+        .get()
+        .then((result) {
+      for (DocumentSnapshot product in result.docs) {
+        products.add(ProductModel.fromSnapshot(product));
+      }
+    });
+    return products;
+  }
 }

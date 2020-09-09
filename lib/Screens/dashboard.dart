@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:haatbazaar/Screens/Home.dart';
 import 'package:haatbazaar/Screens/wish_list.dart';
-import 'package:haatbazaar/sidebar/main_drawer.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'account.dart';
 import 'message.dart';
 
@@ -19,13 +18,19 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   int _selectedPage = 0;
   List<Widget> pageList = [];
+  Widget currentPage;
+  // final PageStorageBucket bucket = PageStorageBucket();
+  // final Key homeKey = PageStorageKey('homeKey');
 
   @override
   void initState() {
-    pageList.add(HomePage());
+    pageList.add(HomePage(
+        // key: homeKey,
+        ));
     pageList.add(Message());
     pageList.add(WishList());
     pageList.add(Account());
+    currentPage = pageList[0];
     super.initState();
   }
 
@@ -76,13 +81,26 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         false;
   }
 
+  PageController _pageController = PageController();
+  _onPageChanged(int index) {
+    setState(() {
+      _selectedPage = index;
+    });
+  }
+
+  _onItemTapped(int selectedIndex) {
+    _pageController.jumpToPage(selectedIndex);
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        body: IndexedStack(
-          index: _selectedPage,
+        body: PageView(
+          controller: _pageController,
+          onPageChanged: _onPageChanged,
+          physics: NeverScrollableScrollPhysics(),
           children: pageList,
         ),
         bottomNavigationBar: Container(
@@ -93,22 +111,43 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
               unselectedFontSize: 11.0,
               selectedFontSize: 11.0,
               iconSize: 20.0,
-              onTap: (int index) {
-                setState(() {
-                  _selectedPage = index;
-                });
-              },
+              onTap: _onItemTapped,
               items: <BottomNavigationBarItem>[
                 BottomNavigationBarItem(
-                    icon: Icon(Icons.home), title: Text('Home')),
+                    icon: Icon(Icons.home,
+                        color: _selectedPage == 0 ? Colors.red : Colors.grey),
+                    title: Text(
+                      'Home',
+                      style: TextStyle(
+                          color: _selectedPage == 0 ? Colors.red : Colors.grey),
+                    )),
                 BottomNavigationBarItem(
-                    icon: Icon(Icons.chat_bubble), title: Text('Messages')),
+                    icon: Icon(Icons.chat_bubble,
+                        color: _selectedPage == 1 ? Colors.red : Colors.grey),
+                    title: Text(
+                      'Messages',
+                      style: TextStyle(
+                          color: _selectedPage == 1 ? Colors.red : Colors.grey),
+                    )),
                 BottomNavigationBarItem(
-                    icon: Icon(Icons.favorite), title: Text('Favourites')),
+                    icon: Icon(Icons.favorite,
+                        color: _selectedPage == 2 ? Colors.red : Colors.grey),
+                    title: Text(
+                      'Favourites',
+                      style: TextStyle(
+                          color: _selectedPage == 2 ? Colors.red : Colors.grey),
+                    )),
                 BottomNavigationBarItem(
-                    icon: Icon(Icons.perm_identity), title: Text('Account')),
+                  icon: Icon(Icons.perm_identity,
+                      color: _selectedPage == 3 ? Colors.red : Colors.grey),
+                  title: Text(
+                    'Account',
+                    style: TextStyle(
+                        color: _selectedPage == 3 ? Colors.red : Colors.grey),
+                  ),
+                ),
               ],
-              currentIndex: _selectedPage,
+              // currentIndex: _selectedPage,
             )),
       ),
     );

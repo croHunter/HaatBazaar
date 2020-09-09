@@ -26,6 +26,7 @@ ItemList itemList = ItemList();
 SlideItemList slideItemList = SlideItemList();
 
 class HomePage extends StatefulWidget {
+  // HomePage({Key key}) : super(key: key);
   static String id = 'home';
 
   @override
@@ -33,7 +34,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   final _auth = FirebaseAuth.instance;
   User loggedInUser;
 
@@ -184,6 +185,7 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Container(
       color: Colors.red,
       child: SafeArea(
@@ -398,6 +400,10 @@ class _HomePageState extends State<HomePage>
       ),
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }
 
 class ProductSearch extends SearchDelegate<String> {

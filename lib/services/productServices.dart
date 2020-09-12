@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:haatbazaar/db/product.dart';
+import 'package:haatbazaar/model/productmodel.dart';
 import 'package:path/path.dart' as Path;
 import 'package:uuid/uuid.dart';
 

@@ -14,7 +14,7 @@ import 'package:haatbazaar/Screens/cart_list.dart';
 import 'package:haatbazaar/Screens/product_detail.dart';
 import 'package:haatbazaar/admin_screen/productList.dart';
 import 'package:haatbazaar/constants.dart';
-import 'package:haatbazaar/db/product.dart';
+import 'package:haatbazaar/model/productmodel.dart';
 import 'package:haatbazaar/sidebar/main_drawer.dart';
 
 import '../Model/itemList.dart';
@@ -97,14 +97,9 @@ class _HomePageState extends State<HomePage>
 
   void getCurrentUser() async {
     try {
-      print('sj1');
       final user = _auth.currentUser;
-      print(user);
-      print('sj2');
       if (user != null) {
         loggedInUser = user;
-        //  print(loggedInUser.phoneNumber);
-        print(loggedInUser);
       }
     } catch (e) {
       print("second last error : $e");
@@ -125,7 +120,7 @@ class _HomePageState extends State<HomePage>
 
   int noOFFeaturedProducts;
 
-  Widget categoryList(
+  Widget dailyList(
       BuildContext context, int index, List<ProductModel> products) {
     return InkWell(
       onTap: () async {
@@ -135,17 +130,8 @@ class _HomePageState extends State<HomePage>
             builder: (context) {
               // int weight=5;
               return ProductDetail(
-                gridIndex: index,
-                name: products[index].productName,
-                imageUrl: products[index].imageURL,
-                price: products[index].getPrice,
-                brand: products[index].brand,
-                quantity: products[index].quantity,
-                description: products[index].description,
-                isOnSale: products[index].isOnSale,
-                isFeatured: products[index].isFeatured,
-                isDailyNeed: products[index].isDailyNeed,
-                id: products[index].id,
+                index: index,
+                products: products,
               );
             },
           ),
@@ -259,7 +245,7 @@ class _HomePageState extends State<HomePage>
                             margin: EdgeInsets.only(top: 5.0),
                             child: ListView.builder(
                                 itemBuilder: (BuildContext context, int index) {
-                                  return categoryList(context, index, products);
+                                  return dailyList(context, index, products);
                                 },
                                 itemCount: products.length,
                                 scrollDirection: Axis.horizontal),
@@ -484,17 +470,8 @@ class ProductSearch extends SearchDelegate<String> {
               MaterialPageRoute(builder: (context) {
                 // int weight=5;
                 return ProductDetail(
-                  gridIndex: index,
-                  name: product[index].productName,
-                  imageUrl: product[index].imageURL,
-                  price: product[index].getPrice,
-                  brand: product[index].brand,
-                  quantity: product[index].quantity,
-                  description: product[index].description,
-                  isOnSale: product[index].isOnSale,
-                  isFeatured: product[index].isFeatured,
-                  isDailyNeed: product[index].isDailyNeed,
-                  id: product[index].id,
+                  index: index,
+                  products: products,
                 );
               }),
             ); // showResults(context);

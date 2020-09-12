@@ -49,7 +49,7 @@ class HaatBazaar extends StatelessWidget {
         ConfirmOrder.id: (context) => ConfirmOrder(),
         CartList.id: (context) => CartList(),
         WishList.id: (context) => WishList(),
-        DailyTabBar.id: (context) => DailyTabBar(),
+        //DailyTabBar.id: (context) => DailyTabBar(),
         Message.id: (context) => Message(),
         ProductList.id: (context) => ProductList(),
       },

@@ -62,10 +62,8 @@ class _MainDrawerState extends State<MainDrawer> {
                     ),
                     widget.loggedInUser != 'Unknown'
                         ? FlatButton(
-                            onPressed: () {
-                              setState(() {
-                                widget.auth.signOut();
-                              });
+                            onPressed: () async {
+                              await widget.auth.signOut();
                               Navigator.pushNamed(context, Dashboard.id);
                             },
                             child: Text(

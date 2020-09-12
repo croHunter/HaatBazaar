@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:haatbazaar/Screens/product_detail.dart';
-import 'package:haatbazaar/db/product.dart';
+import 'package:haatbazaar/model/productmodel.dart';
 
 import 'Home.dart';
 
@@ -47,17 +47,8 @@ class _FeaturedProductState extends State<FeaturedProduct> {
                         builder: (context) {
                           // int weight=5;
                           return ProductDetail(
-                            gridIndex: index,
-                            name: widget.products[index].productName,
-                            imageUrl: widget.products[index].imageURL,
-                            price: widget.products[index].getPrice,
-                            brand: widget.products[index].brand,
-                            quantity: widget.products[index].quantity,
-                            description: widget.products[index].description,
-                            isOnSale: widget.products[index].isOnSale,
-                            isFeatured: widget.products[index].isFeatured,
-                            isDailyNeed: widget.products[index].isDailyNeed,
-                            id: widget.products[index].id,
+                            index: index,
+                            products: widget.products,
                           );
                         },
                       ),

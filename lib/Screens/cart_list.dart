@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:haatbazaar/RefactorComponent/CWClearItemButton.dart';
-import 'package:haatbazaar/RefactorComponent/CWListItem.dart';
 import 'package:haatbazaar/RefactorComponent/CheckOutSection.dart';
+import 'package:haatbazaar/RefactorComponent/RoundedMaterialButton.dart';
 import 'package:haatbazaar/Screens/conform_order.dart';
+import 'package:haatbazaar/Screens/product_detail.dart';
+
 import 'Home.dart';
 
 class CartList extends StatefulWidget {
@@ -13,10 +15,16 @@ class CartList extends StatefulWidget {
 }
 
 class _CartListState extends State<CartList> {
+  //UserModel _userModel;
 //  StreamController _event = StreamController<double>.broadcast();
-  List<double> _counter = List();
+  //List<double> _counter = List();
   @override
   void initState() {
+    try {
+      print('cart length ${cartService.userModel.cart.length}');
+    } catch (e) {
+      print('cart error $e');
+    }
 //    _event.add(0);
     super.initState();
   }
@@ -47,7 +55,7 @@ class _CartListState extends State<CartList> {
                     icon: Icon(Icons.clear),
                     onPressed: () {
                       setState(() {
-                        itemList.removeAllCartItem();
+                        // itemList.removeAllCartItem();
                       });
                     },
                   )
@@ -56,54 +64,167 @@ class _CartListState extends State<CartList> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: itemList.cartItemLength(),
+                itemCount: cartService.userModel.cart.length,
                 itemBuilder: (BuildContext context, int index) {
-                  if (_counter.length < itemList.cartItemLength()) {
-                    _counter.add(1.0);
-                  }
+                  // if (_counter.length < itemList.cartItemLength()) {
+                  //   _counter.add(1.0);
+                  // }
+                  print('cart length ${cartService.userModel.cart.length}');
 
                   return Stack(
                     children: <Widget>[
-                      CWListItem(
-                        listIndex: index,
-                        productAmount: _counter[index],
-                        onPressedMinus: () {
-                          if (_counter[index] <= 0) {
-                            _counter[index] = 0;
-                          } else {
-                            _counter[index] = _counter[index] - 0.25;
-                          }
-//                          _event.add(_counter[index]);
-                          setState(() {});
-                        },
-                        onPressedPlus: () {
-                          if (_counter[index] >= 0 &&
-                              _counter[index] < itemList.getMaxWeight(index)) {
-                            _counter[index] = _counter[index] + 0.25;
-                          } else {
-                            _counter[index] = itemList.getMaxWeight(index);
-                          }
-//                          _event.add(_counter[index]);
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0, vertical: 4.0),
+                        child: Material(
+                          color: Colors.grey.shade100,
+                          clipBehavior: Clip.antiAlias,
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Container(
+                                height: 75.0,
+                                width: 90.0,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(10.0),
+                                      bottomLeft: Radius.circular(10.0)),
+                                  color: Colors.black,
+                                  image: DecorationImage(
+                                    image: NetworkImage(
+                                      cartService.userModel.cart[index].image,
+                                    ),
+                                    fit: BoxFit.cover,
+                                    alignment: Alignment.center,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 8.0),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: <Widget>[
+                                            Text(
+                                              cartService
+                                                  .userModel.cart[index].name,
+                                              style: TextStyle(
+                                                  fontSize: 14.0,
+                                                  fontWeight: FontWeight.w500),
+                                            ),
+                                            Text(
+                                              'Price: Rs.${cartService.userModel.cart[index].price} per kg',
+                                              style: TextStyle(
+                                                fontSize: 12.0,
+                                              ),
+                                            ),
+                                            Text(
+                                              'Total: Rs. total',
+                                              style: TextStyle(
+                                                fontSize: 12.0,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: <Widget>[
+                                            Card(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 5.0,
+                                                        vertical: 0.0),
+                                                child: Text(
+                                                  '${cartService.userModel.cart[index].quantity} kg',
+                                                  style: TextStyle(
+                                                      color: Colors.green,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 16.0),
+                                                ),
+                                              ),
+                                            ),
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: <Widget>[
+                                                RoundIconButton(
+                                                  icon: Icons.remove,
+                                                  onPressed: () {
+                                                    // if (_counter[index] >= 0 &&
+                                                    //     _counter[index] <
+                                                    //         itemList
+                                                    //             .getMaxWeight(
+                                                    //                 index)) {
+                                                    //   _counter[index] =
+                                                    //       _counter[index] +
+                                                    //           0.25;
+                                                    // } else {
+                                                    //   _counter[index] = itemList
+                                                    //       .getMaxWeight(index);
+                                                    // }
+                                                    // // _event.add(_counter[index]);
 
-                          setState(() {});
-                        },
-//                        stream: _event.stream,
-                        total: 100.0,
-                        assetImage: itemList.assetCartImage(index),
-                        itemName: itemList.cartImageName(index),
-                        price: itemList.cartPrice(index),
+                                                    setState(() {});
+                                                  },
+                                                ),
+                                                RoundIconButton(
+                                                  icon: Icons.add,
+                                                  onPressed: () {
+                                                    // if (_counter[index] >= 0 &&
+                                                    //     _counter[index] <
+                                                    //         itemList
+                                                    //             .getMaxWeight(
+                                                    //                 index)) {
+                                                    //   _counter[index] =
+                                                    //       _counter[index] +
+                                                    //           0.25;
+                                                    // } else {
+                                                    //   _counter[index] = itemList
+                                                    //       .getMaxWeight(index);
+                                                    // }
+                                                    // // _event.add(_counter[index]);
+
+                                                    setState(() {});
+                                                  },
+                                                ),
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
                       ),
                       CWClearItem(
                         onPressed: () {
                           setState(() {
-                            _counter.removeAt(index);
-                            itemList.removeCartItem(index);
+                            // _counter.removeAt(index);
+                            // itemList.removeCartItem(index);
                           });
-//                          Scaffold.of(context).showSnackBar(SnackBar(
-//                            content:
-//                                Text('Cauliflower is removed from Cart list'),
-//                            duration: Duration(milliseconds: 200),
-//                          ));
                         },
                       ),
                     ],
@@ -111,7 +232,7 @@ class _CartListState extends State<CartList> {
                 },
               ),
             ),
-            itemList.isNotEmptyCart()
+            cartService.userModel.cart.isNotEmpty
                 ? CheckOutSection(
                     total: itemList.cartSum(),
                     onPressed: () {

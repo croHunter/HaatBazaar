@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:haatbazaar/Screens/product_detail.dart';
 import 'package:haatbazaar/admin_screen/productList.dart';
-import 'package:haatbazaar/db/product.dart';
+import 'package:haatbazaar/model/productmodel.dart';
 
 import 'Home.dart';
 
@@ -52,17 +52,8 @@ class _DailyVegetableItemState extends State<DailyVegetableItem> {
                             builder: (context) {
                               // int weight=5;
                               return ProductDetail(
-                                gridIndex: index,
-                                name: products[index].productName,
-                                imageUrl: products[index].imageURL,
-                                price: products[index].getPrice,
-                                brand: products[index].brand,
-                                quantity: products[index].quantity,
-                                description: products[index].description,
-                                isOnSale: products[index].isOnSale,
-                                isFeatured: products[index].isFeatured,
-                                isDailyNeed: products[index].isDailyNeed,
-                                id: products[index].id,
+                                index: index,
+                                products: products,
                               );
                             },
                           ),

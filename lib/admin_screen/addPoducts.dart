@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:haatbazaar/db/brand.dart';
-import 'package:haatbazaar/db/category.dart';
-import 'package:haatbazaar/db/productServices.dart';
+import 'package:haatbazaar/services/brand.dart';
+import 'package:haatbazaar/services/category.dart';
+import 'package:haatbazaar/services/productServices.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:toast/toast.dart';
 

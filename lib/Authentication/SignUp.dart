@@ -5,7 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:haatbazaar/RefactorComponent/clippath.dart';
 import 'package:haatbazaar/Screens/dashboard.dart';
-import 'package:haatbazaar/db/userInfo.dart';
+import 'package:haatbazaar/services/userservices.dart';
+
+UserInfoService userInfoService = UserInfoService();
 
 class SignUp extends StatefulWidget {
   static String id = 'SignUp';
@@ -29,7 +31,7 @@ class _SignUpState extends State<SignUp> {
       location;
   bool showSpinner = false;
   bool validated = false;
-  UserInfoService _userInfoService = UserInfoService();
+
   Future<void> _verifyPhone(String phoneNo) async {
     setState(() {
       showSpinner = true;
@@ -43,7 +45,7 @@ class _SignUpState extends State<SignUp> {
 
           // Sign the user in (or link) with the auto-generated credential
 
-          await _auth.signInWithCredential(credential);
+          // await _auth.signInWithCredential(credential);
         },
         //2
         verificationFailed: (FirebaseAuthException e) {
@@ -63,7 +65,7 @@ class _SignUpState extends State<SignUp> {
             showSpinner = false;
           });
 
-          smsCodeDialog(context).then((value) {
+          await smsCodeDialog(context).then((value) {
             print("Code Sent");
             print('value: $value');
           });
@@ -81,8 +83,8 @@ class _SignUpState extends State<SignUp> {
     }
   }
 
-  Future<bool> smsCodeDialog(BuildContext context) {
-    return showDialog(
+  Future<bool> smsCodeDialog(BuildContext context) async {
+    return await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
@@ -97,15 +99,18 @@ class _SignUpState extends State<SignUp> {
           contentPadding: EdgeInsets.all(10.0),
           actions: <Widget>[
             new FlatButton(
-                onPressed: () {
+                onPressed: () async {
                   setState(() {
                     showSpinner = true;
                   });
                   try {
                     final user = FirebaseAuth.instance.currentUser;
+
                     if (user != null) {
+                      print('user no. is already signUp');
                       setState(() {
                         showSpinner = false;
+                        _verified = true;
                       });
 
                       Navigator.of(context).pop();
@@ -114,8 +119,10 @@ class _SignUpState extends State<SignUp> {
                         MaterialPageRoute(builder: (context) => Dashboard()),
                       );
                     } else {
+                      print('if there is no user then going to sign in ');
+
                       Navigator.of(context).pop();
-                      signIn(smsSent);
+                      await signIn(smsSent);
                     }
                   } catch (e) {
                     print('forth error: $e');
@@ -138,14 +145,18 @@ class _SignUpState extends State<SignUp> {
 
     // Sign the user in (or link) with the credential
     await _auth.signInWithCredential(phoneAuthCredential).then((user) {
+      print(user);
       setState(() {
         showSpinner = false;
       });
-
-      setState(() {
-        _verified = true;
-      });
-      Navigator.pushNamed(context, Dashboard.id);
+      _verified = true;
+      if (_verified) {
+        //creating the user data
+        print('4$_verified');
+        userInfoService.createUser(user.user.uid, fullName, phoneNo, password,
+            location, user.user.metadata.creationTime);
+        Navigator.pushNamed(context, Dashboard.id);
+      }
     }).catchError((e) {
       print('third error:$e');
     });
@@ -177,7 +188,7 @@ $
     Pattern pattern =
         r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
     RegExp regex = new RegExp(pattern);
-    print(value);
+    print('validating password $value');
     if (value.isEmpty) {
       return 'Please enter password';
     } else {
@@ -456,51 +467,56 @@ $
                               fontWeight: FontWeight.w700,
                               fontSize: 18.0),
                         ),
-                        onPressed: () {
+                        onPressed: () async {
+                          print('1$_verified');
                           _validateInputs();
                           if (validated) {
-                            _verifyPhone(phoneNo);
-                            if (_verified) {
-                              //creating the user data
-                              _userInfoService.createUser(
-                                  fullName, phoneNo, password, location);
-                            }
-                            _verified = false;
+                            print('2$_verified');
+                            await _verifyPhone(phoneNo);
+                            print('3$_verified');
+                            // if (_verified) {
+                            //   //creating the user data
+                            //   print('4$_verified');
+                            //   await _userInfoService.createUser(
+                            //       fullName, phoneNo, password, location);
+                            //   Navigator.pushNamed(context, Dashboard.id);
+                            // }
+                            //_verified = false;
                           }
                           validated = false;
                         },
                       ),
                     ),
 
-                    Divider(
-                      color: Colors.black45,
-                      thickness: 1.0,
-                      indent: 10.0,
-                      endIndent: 10.0,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 32.0),
-                      child: Column(
-                        children: <Widget>[
-                          Text('or, connect with'),
-                          SizedBox(
-                            height: 10.0,
-                          ),
-                          OutlineButton.icon(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20.0)),
-                            borderSide: BorderSide(color: Color(0xffff3a5a)),
-                            color: Color(0xffff3a5a),
-                            highlightedBorderColor: Color(0xffff3a5a),
-                            textColor: Color(0xffff3a5a),
-                            icon: Icon(Icons.perm_identity,
-                                size: 18.0), //FontAwesomeIcons.googlePlusG
-                            label: Text('Google'),
-                            onPressed: () {},
-                          ),
-                        ],
-                      ),
-                    )
+                    // Divider(
+                    //   color: Colors.black45,
+                    //   thickness: 1.0,
+                    //   indent: 10.0,
+                    //   endIndent: 10.0,
+                    // ),
+                    // Padding(
+                    //   padding: EdgeInsets.symmetric(horizontal: 32.0),
+                    //   child: Column(
+                    //     children: <Widget>[
+                    //       Text('or, connect with'),
+                    //       SizedBox(
+                    //         height: 10.0,
+                    //       ),
+                    //       OutlineButton.icon(
+                    //         shape: RoundedRectangleBorder(
+                    //             borderRadius: BorderRadius.circular(20.0)),
+                    //         borderSide: BorderSide(color: Color(0xffff3a5a)),
+                    //         color: Color(0xffff3a5a),
+                    //         highlightedBorderColor: Color(0xffff3a5a),
+                    //         textColor: Color(0xffff3a5a),
+                    //         icon: Icon(Icons.perm_identity,
+                    //             size: 18.0), //FontAwesomeIcons.googlePlusG
+                    //         label: Text('Google'),
+                    //         onPressed: () {},
+                    //       ),
+                    //     ],
+                    //   ),
+                    // )
                   ]),
           ),
         ),

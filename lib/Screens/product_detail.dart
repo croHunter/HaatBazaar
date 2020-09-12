@@ -1,34 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:haatbazaar/model/productmodel.dart';
+import 'package:haatbazaar/services/cartservice.dart';
 
 import 'Home.dart';
 import 'conform_order.dart';
 
+
+CartService cartService = CartService();
 class ProductDetail extends StatefulWidget {
-  ProductDetail(
-      {this.gridIndex,
-      this.name,
-      this.imageUrl,
-      this.price,
-      this.brand,
-      this.quantity,
-      this.description,
-      this.isOnSale,
-      this.isFeatured,
-      this.isDailyNeed,
-      this.id});
-  final int gridIndex;
-  final String name;
-  final String imageUrl;
-  final double price;
-  final String brand;
-  final double quantity;
-  final String description;
-  final bool isOnSale;
-  final bool isFeatured;
-  final bool isDailyNeed;
-  final String id;
+  ProductDetail({this.index, this.products});
+  final int index;
+  final List<ProductModel> products;
+
 
   @override
   _ProductDetailState createState() => _ProductDetailState();
@@ -36,11 +21,14 @@ class ProductDetail extends StatefulWidget {
 
 class _ProductDetailState extends State<ProductDetail>
     with TickerProviderStateMixin {
+  final _key = GlobalKey<ScaffoldState>();
+
   int weight = 5;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _key,
       body: Stack(
         children: <Widget>[
           Container(
@@ -50,9 +38,9 @@ class _ProductDetailState extends State<ProductDetail>
             height: 400.0,
             width: double.infinity,
             child: Hero(
-              tag: 'item${widget.gridIndex}',
+              tag: 'item${widget.index}',
               child: Image.network(
-                widget.imageUrl,
+                widget.products[widget.index].imageURL,
                 fit: BoxFit.cover,
               ),
             ),
@@ -72,7 +60,7 @@ class _ProductDetailState extends State<ProductDetail>
                     Padding(
                       padding: const EdgeInsets.only(left: 10.0),
                       child: Text(
-                        '${widget.name}',
+                        '${widget.products[widget.index].productName}',
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 28.0,
@@ -81,13 +69,13 @@ class _ProductDetailState extends State<ProductDetail>
                     ),
                     Spacer(),
                     IconButton(
-                      color: itemList.containWish(widget.gridIndex)
+                      color: itemList.containWish(widget.index)
                           ? Colors.redAccent
                           : Colors.white,
                       icon: Icon(Icons.favorite),
                       onPressed: () {
                         setState(() {
-                          itemList.wishList(widget.gridIndex);
+                          itemList.wishList(widget.index);
                         });
 
                         // assets.wishListItems.add(assets.images[index]);
@@ -119,11 +107,12 @@ class _ProductDetailState extends State<ProductDetail>
                           Spacer(),
                           Column(
                             children: <Widget>[
-                              widget.isOnSale
+                              widget.products[widget.index].isOnSale
                                   ? Text('Total')
                                   : Text('Sold',
                                       style: TextStyle(color: Colors.red)),
-                              Text('Rs.${weight * widget.price}'),
+                              Text(
+                                  'Rs.${weight * widget.products[widget.index].getPrice}'),
                             ],
                           ),
                         ],
@@ -165,7 +154,7 @@ class _ProductDetailState extends State<ProductDetail>
                         height: 10.0,
                       ),
                       Text(
-                        "${widget.description}",
+                        "${widget.products[widget.index].description}",
                         style: TextStyle(
                           fontSize: 14.0,
                           fontWeight: FontWeight.w300,
@@ -224,7 +213,7 @@ class _ProductDetailState extends State<ProductDetail>
                         color: Colors.purple,
                         borderRadius: BorderRadius.circular(5.0)),
                     child: Text(
-                      'Rs.${widget.price}/kg',
+                      'Rs.${widget.products[widget.index].getPrice}/kg',
                       style: TextStyle(
                           fontSize: 12.0,
                           fontWeight: FontWeight.normal,
@@ -267,10 +256,28 @@ class _ProductDetailState extends State<ProductDetail>
                         style: TextStyle(
                             fontWeight: FontWeight.normal, fontSize: 12.0),
                       ),
-                      onPressed: () {
-                        setState(() {
-                          itemList.cartList2(widget.gridIndex);
-                        });
+                      onPressed: () async {
+                        bool success = await cartService.addToCart(
+                            product: widget.products[widget.index],
+                            quantity: weight.toDouble());
+                        if (success) {
+                          _key.currentState.showSnackBar(
+                              SnackBar(content: Text("Added to Cart!")));
+                          bool sucess_2 = await cartService.reloadUserModel();
+                          if (sucess_2) {
+                            print('sucess');
+                          } else {
+                            print('failed');
+                          }
+                          return; //stop execution whatever after
+                        } else {
+                          _key.currentState.showSnackBar(
+                              SnackBar(content: Text("Not added to Cart!")));
+                          return;
+                        }
+                        // setState(() {
+                        //   itemList.cartList2(widget.index);
+                        // });
                         // Scaffold.of(context).showSnackBar(SnackBar(content: Text('Cauliflower is added to the Cart list'),));
                       },
                     ),
@@ -297,8 +304,7 @@ class _ProductDetailState extends State<ProductDetail>
                             builder: (context) {
                               // int weight=5;
                               return ConfirmOrder(
-                                total:
-                                    weight * itemList.price(widget.gridIndex),
+                                total: weight * itemList.price(widget.index),
                               );
                             },
                           ),

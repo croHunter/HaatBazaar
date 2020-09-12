@@ -5,7 +5,7 @@ class ProductModel {
   static const CATEGORY = 'category';
   static const QUANTITY = 'quantity';
   static const DESCRIPTION = 'description';
-  static const ID = 'id';
+  static const ID = 'id'; //productId
   static const PRICE = 'price';
   static const IS_DAILY_NEED = 'isDailyNeed';
   static const IS_FEATURED = 'isFeatured';
@@ -22,8 +22,9 @@ class ProductModel {
   bool _isDailyNeed;
   bool _isFeatured;
   bool _isOnSale;
-  int _noOfProduct;
+  // int _noOfProduct;
 
+  //named constructor
   ProductModel.fromSnapshot(snapshot) {
     Map data = snapshot.data();
     _productName = data[NAME];
@@ -51,5 +52,6 @@ class ProductModel {
   bool get isDailyNeed => _isDailyNeed;
   bool get isFeatured => _isFeatured;
   bool get isOnSale => _isOnSale;
-  int get noOfProduct => _noOfProduct;
+  //int get noOfProduct => _noOfProduct;
+
 }

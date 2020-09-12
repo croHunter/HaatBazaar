@@ -47,7 +47,7 @@ class _SignInState extends State<SignIn> {
 
           // Sign the user in (or link) with the auto-generated credential
 
-          await _auth.signInWithCredential(credential);
+          //  await _auth.signInWithCredential(credential);
         },
         //2
         verificationFailed: (FirebaseAuthException e) {
@@ -213,7 +213,12 @@ class _SignInState extends State<SignIn> {
                           child: TextFormField(
                             keyboardType: TextInputType.visiblePassword,
                             obscureText: _obscureText,
-                            onChanged: (String value) {},
+                            onChanged: (String value) {
+                              password = value;
+                            },
+                            onSaved: (String value) {
+                              password = value;
+                            },
                             cursorColor: Colors.deepOrange,
                             decoration: InputDecoration(
                               hintText: 'Password',
@@ -268,9 +273,13 @@ class _SignInState extends State<SignIn> {
                                   fontWeight: FontWeight.w700,
                                   fontSize: 18.0),
                             ),
-                            onPressed: () {
+                            onPressed: ()  {
                               _validateInputs();
-                              if (_validated) {
+                              bool passVerify =  userInfoService
+                                  .verifyPassword(password);
+                              //TODO:Here is the bug which is need to fix
+                              print('here is the main problem :$passVerify');
+                              if (_validated && passVerify) {
                                 _verifyPhone(phoneNo);
                               }
                               _validated = false;

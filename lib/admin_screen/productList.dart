@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:haatbazaar/db/product.dart';
+import 'package:haatbazaar/model/productmodel.dart';
 
-import '../db/productServices.dart';
+import '../services/productServices.dart';
 
 ProductServices productServices = ProductServices();
 

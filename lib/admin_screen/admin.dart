@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:haatbazaar/admin_screen/addPoducts.dart';
 import 'package:haatbazaar/admin_screen/productList.dart';
-import 'package:haatbazaar/db/brand.dart';
-import 'package:haatbazaar/db/category.dart';
+import 'package:haatbazaar/services/brand.dart';
+import 'package:haatbazaar/services/category.dart';
 import 'package:toast/toast.dart';
 
 enum Page { dashboard, manage }

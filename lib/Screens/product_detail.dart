@@ -7,13 +7,12 @@ import 'package:haatbazaar/services/cartservice.dart';
 import 'Home.dart';
 import 'conform_order.dart';
 
-
 CartService cartService = CartService();
+
 class ProductDetail extends StatefulWidget {
   ProductDetail({this.index, this.products});
   final int index;
   final List<ProductModel> products;
-
 
   @override
   _ProductDetailState createState() => _ProductDetailState();
@@ -261,14 +260,14 @@ class _ProductDetailState extends State<ProductDetail>
                             product: widget.products[widget.index],
                             quantity: weight.toDouble());
                         if (success) {
+                          //bool sucess_2 = await cartService.reloadUserModel();
+                          // if (sucess_2) {
                           _key.currentState.showSnackBar(
                               SnackBar(content: Text("Added to Cart!")));
-                          bool sucess_2 = await cartService.reloadUserModel();
-                          if (sucess_2) {
-                            print('sucess');
-                          } else {
-                            print('failed');
-                          }
+                          //   print('sucess');
+                          // } else {
+                          //   print('failed');
+                          // }
                           return; //stop execution whatever after
                         } else {
                           _key.currentState.showSnackBar(

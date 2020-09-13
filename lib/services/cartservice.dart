@@ -1,13 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:haatbazaar/Screens/conform_order.dart';
 import 'package:haatbazaar/model/cartitemmodel.dart';
+import 'package:haatbazaar/model/ordermodel.dart';
 import 'package:haatbazaar/model/productmodel.dart';
 import 'package:haatbazaar/model/usermodel.dart';
 import 'package:haatbazaar/services/userservices.dart';
 import 'package:uuid/uuid.dart';
 
 class CartService {
-  UserModel _userModel;
+  UserModel _userModel; //it is a vip object
   UserModel get userModel => _userModel;
+
+  // public variables
+  List<OrderModel> orders = [];
   UserInfoService _userInfoService = UserInfoService();
   final FirebaseAuth auth = FirebaseAuth.instance;
   String getUserId() {
@@ -25,12 +30,15 @@ class CartService {
       "imageURL": product.imageURL,
       "id": product.id,
       "price": product.getPrice,
+      // "quantities": product.quantity,
       "quantity": quantity,
     };
     try {
       // List<CartItemModel> cart = _userModel.cart; //not really used
+      print(getUserId());
       CartItemModel item = CartItemModel.fromMap(
           cartItem); //mapping to the cart_item_model (for mapping database)
+      print(getUserId());
       print(getUserId());
       await _userInfoService.addToCart(userId: getUserId(), cartItem: item);
 
@@ -54,16 +62,23 @@ class CartService {
     }
   }
 
-  // UserModel get userModel => _userModel;
-
   Future<bool> removeFromCart({CartItemModel cartItem}) async {
-    print("THE PRODUC IS: ${cartItem.toString()}");
+    print("THE PRODUCT IS: ${cartItem.toString()}");
 
     try {
       _userInfoService.removeFromCart(userId: getUserId(), cartItem: cartItem);
       return true;
     } catch (e) {
       print("THE ERROR ${e.toString()}");
+      return false;
+    }
+  }
+
+  Future<bool> getOrders() async {
+    try {
+      orders = await orderServices.getUserOrders(userId: getUserId());
+      return true;
+    } catch (e) {
       return false;
     }
   }

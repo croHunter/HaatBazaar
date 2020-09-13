@@ -192,8 +192,14 @@ class _HomePageState extends State<HomePage>
                   floating: true,
                   actions: <Widget>[
                     GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, CartList.id);
+                      onTap: () async{
+                        bool success=await cartService.reloadUserModel();
+                        if(success) {
+                          Navigator.pushNamed(context, CartList.id);
+                        }
+                        else{
+                          print ('reload failed');
+                        }
                       },
                       child: Icon(Icons.add_shopping_cart),
                     ),

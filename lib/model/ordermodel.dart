@@ -14,7 +14,7 @@ class OrderModel {
   String _userId;
   String _status;
   int _createdAt;
-  int _total;
+  double _total;
 
   // public variable
   List cart;
@@ -34,6 +34,6 @@ class OrderModel {
   String get description => _description;
   String get userId => _userId;
   String get status => _status;
-  int get total => _total;
+  double get total => _total;
   int get createdAt => _createdAt;
 }

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:haatbazaar/Screens/Home.dart';
 import 'package:haatbazaar/Screens/wish_list.dart';
 
-import 'message.dart';
+import 'notification.dart';
 
 class Account extends StatefulWidget {
   static String id = 'account';
@@ -88,7 +88,7 @@ class _AccountState extends State<Account> {
                             color: Colors.white,
                             elevation: 5.0,
                             onPressed: () {
-                              Navigator.pushNamed(context, Message.id);
+                              Navigator.pushNamed(context, Notifications.id);
                             },
                             child: Column(
                               children: <Widget>[

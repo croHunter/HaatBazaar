@@ -4,6 +4,7 @@ class CartItemModel {
   static const IMAGE = "imageURL";
   static const PRODUCT_ID = "id";
   static const PRICE = "price";
+  // static const QUANTITIES = "quantities";
   static const QUANTITY = "quantity";
 
   String _id;
@@ -12,6 +13,7 @@ class CartItemModel {
   String _productId;
   double _price;
   double _quantity;
+  //String _quantities;
 
   //creating a map
   Map toMap() => {
@@ -20,6 +22,7 @@ class CartItemModel {
         NAME: _name,
         PRODUCT_ID: _productId,
         PRICE: _price,
+        //   QUANTITIES: _quantities,
         QUANTITY: _quantity
       };
 
@@ -30,6 +33,7 @@ class CartItemModel {
     _image = data[IMAGE]; //imageUrl
     _productId = data[PRODUCT_ID];
     _price = data[PRICE];
+    //_quantities = data[QUANTITIES];
     _quantity = data[QUANTITY];
   }
 
@@ -39,5 +43,6 @@ class CartItemModel {
   String get image => _image;
   String get productId => _productId;
   double get price => _price;
+//  String get quantities => _quantities;
   double get quantity => _quantity;
 }

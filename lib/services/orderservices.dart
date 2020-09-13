@@ -12,16 +12,14 @@ class OrderServices {
       String description,
       String status,
       List<CartItemModel> cart,
-      int totalPrice}) {
+      double totalPrice}) {
     List<Map> convertedCart = [];
-
     for (CartItemModel item in cart) {
       convertedCart.add(item.toMap());
     }
-
     _firestore.collection(collection).doc(id).set({
       "userId": userId,
-      "id": id,
+      "id": id, //cart id
       "cart": convertedCart,
       "total": totalPrice,
       "createdAt": DateTime.now().millisecondsSinceEpoch,
@@ -30,7 +28,8 @@ class OrderServices {
     });
   }
 
-  Future<List<OrderModel>> getUserOrders({String userId}) async => _firestore
+  Future<List<OrderModel>> getUserOrders({String userId}) async =>
+      await _firestore
           .collection(collection)
           .where("userId", isEqualTo: userId)
           .get()

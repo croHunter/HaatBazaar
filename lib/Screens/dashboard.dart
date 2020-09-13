@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:haatbazaar/Screens/Home.dart';
 import 'package:haatbazaar/Screens/wish_list.dart';
+import 'package:haatbazaar/Screens/notification.dart';
 
 import 'account.dart';
-import 'message.dart';
 
 class Dashboard extends StatefulWidget {
   static String id = 'Dashboard';
@@ -27,7 +27,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     pageList.add(HomePage(
         // key: homeKey,
         ));
-    pageList.add(Message());
+    pageList.add(Notifications());
     pageList.add(WishList());
     pageList.add(Account());
     currentPage = pageList[0];
@@ -125,7 +125,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                     icon: Icon(Icons.chat_bubble,
                         color: _selectedPage == 1 ? Colors.red : Colors.grey),
                     title: Text(
-                      'Messages',
+                      'Notification',
                       style: TextStyle(
                           color: _selectedPage == 1 ? Colors.red : Colors.grey),
                     )),

@@ -10,8 +10,7 @@ import 'package:haatbazaar/Screens/materialsplashscreen.dart';
 import 'package:haatbazaar/admin_screen/addPoducts.dart';
 
 import 'Authentication/SignUp.dart';
-import 'Screens/dailyTabBar.dart';
-import 'Screens/message.dart';
+import 'Screens/notification.dart';
 import 'Screens/wish_list.dart';
 import 'admin_screen/admin.dart';
 import 'admin_screen/productList.dart';
@@ -50,7 +49,7 @@ class HaatBazaar extends StatelessWidget {
         CartList.id: (context) => CartList(),
         WishList.id: (context) => WishList(),
         //DailyTabBar.id: (context) => DailyTabBar(),
-        Message.id: (context) => Message(),
+        Notifications.id: (context) => Notifications(),
         ProductList.id: (context) => ProductList(),
       },
     );
